@@ -4,6 +4,7 @@ import dev.biddan.nubblev2.user.domain.Sex;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.error.exception.UserNicknameAlreadyExistsException;
 import dev.biddan.nubblev2.user.repository.UserRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ public class UserRegisterService {
                 .getId();
     }
 
+    @Builder
     public record UserRegisterCommand(
             String nickname,
             String password,
