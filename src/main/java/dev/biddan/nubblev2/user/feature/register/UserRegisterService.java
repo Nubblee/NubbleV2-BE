@@ -1,6 +1,7 @@
 package dev.biddan.nubblev2.user.feature.register;
 
 import dev.biddan.nubblev2.user.domain.User;
+import dev.biddan.nubblev2.user.error.exception.UserLoginIdAlreadyExistsException;
 import dev.biddan.nubblev2.user.error.exception.UserNicknameAlreadyExistsException;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import lombok.Builder;
@@ -16,6 +17,10 @@ public class UserRegisterService {
 
     @Transactional
     public Long register(UserRegisterCommand command) {
+        if (userRepository.existsByLoginId(command.loginId)) {
+            throw new UserLoginIdAlreadyExistsException(command.loginId);
+        }
+
         if (userRepository.existsByNickname(command.nickname)) {
             throw new UserNicknameAlreadyExistsException(command.nickname);
         }

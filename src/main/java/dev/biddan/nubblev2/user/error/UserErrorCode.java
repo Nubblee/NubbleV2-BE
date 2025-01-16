@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 @SuppressWarnings("java:S6548")
 public enum UserErrorCode implements ErrorCode {
+    LOGIN_ID_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 사용중인 아이디입니다."),
     NICKNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 사용중인 닉네임입니다.");
 
     private final HttpStatus httpStatus;
