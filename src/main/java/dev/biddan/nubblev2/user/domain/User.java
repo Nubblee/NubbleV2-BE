@@ -2,13 +2,10 @@ package dev.biddan.nubblev2.user.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,16 +18,20 @@ import org.springframework.util.Assert;
 @Getter
 public class User {
 
+    private static final int MIN_LOGIN_ID_LENGTH = 4;
+    private static final int MAX_LOGIN_ID_LENGTH = 20;
     private static final int MAX_NICKNAME_LENGTH = 20;
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 20;
-    private static final int MIN_BIRTH_YEAR = 1900;
-    private static final int MAX_SEX_LENGTH = 5;
-    private static final int MAX_ADDRESS_LENGTH = 100;
+    private static final int MAX_PREFERRED_AREA_LENGTH = 30;
+    private static final int MAX_EMAIL_LENGTH = 254; // RFC 3696 기준
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = MAX_LOGIN_ID_LENGTH, unique = true)
+    private String loginId;
 
     @Column(nullable = false, length = MAX_NICKNAME_LENGTH, unique = true)
     private String nickname;
@@ -38,18 +39,18 @@ public class User {
     @Column(nullable = false, length = MAX_PASSWORD_LENGTH)
     private String password;
 
-    @Column(nullable = false)
-    private int birthYear;
+    @Column(nullable = false, length = MAX_PREFERRED_AREA_LENGTH)
+    private String preferredArea;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = MAX_SEX_LENGTH)
-    private Sex sex;
-
-    @Column(nullable = false, length = MAX_ADDRESS_LENGTH)
-    private String address;
+    @Column(length = MAX_EMAIL_LENGTH)
+    private String email;
 
     @Builder
-    public User(String nickname, String password, int birthYear, Sex sex, String address) {
+    public User(String loginId, String nickname, String password, String preferredArea, String email) {
+        Assert.hasText(loginId, "로그인 ID는 공백일 수 없습니다.");
+        Assert.isTrue(MIN_LOGIN_ID_LENGTH <= loginId.length() && loginId.length() <= MAX_LOGIN_ID_LENGTH,
+                String.format("로그인 ID는 %d자 이상 %d자 이하여야 합니다.", MIN_LOGIN_ID_LENGTH, MAX_LOGIN_ID_LENGTH));
+
         Assert.hasText(nickname, "닉네임은 공백일 수 없습니다.");
         Assert.isTrue(nickname.length() <= MAX_NICKNAME_LENGTH,
                 String.format("닉네임은 %d자까지 입력 가능합니다.", MAX_NICKNAME_LENGTH));
@@ -58,20 +59,19 @@ public class User {
         Assert.isTrue(MIN_PASSWORD_LENGTH <= password.length() && password.length() <= MAX_PASSWORD_LENGTH,
                 String.format("비밀번호는 %d자 이상 %d자 이하여야 합니다.", MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH));
 
-        int currentYear = LocalDate.now().getYear();
-        Assert.isTrue(birthYear >= MIN_BIRTH_YEAR && birthYear <= currentYear,
-                String.format("출생연도는 %d년부터 %d년 사이여야 합니다.", MIN_BIRTH_YEAR, currentYear));
+        Assert.hasText(preferredArea, "선호 지역을 입력해주세요.");
+        Assert.isTrue(preferredArea.length() <= MAX_PREFERRED_AREA_LENGTH,
+                String.format("선호 지역은 %d자까지 입력 가능합니다.", MAX_PREFERRED_AREA_LENGTH));
 
-        Assert.notNull(sex, "성별을 입력해주세요.");
+        if (email != null) {
+            Assert.isTrue(email.length() <= MAX_EMAIL_LENGTH,
+                    String.format("이메일은 %d자까지 입력 가능합니디ㅏ.", MAX_EMAIL_LENGTH));
+        }
 
-        Assert.hasText(address, "주소를 입력해주세요.");
-        Assert.isTrue(address.length() <= MAX_ADDRESS_LENGTH,
-                String.format("주소는 %d자까지 입력 가능합니다.", MAX_ADDRESS_LENGTH));
-
+        this.loginId = loginId;
         this.nickname = nickname;
         this.password = password;
-        this.birthYear = birthYear;
-        this.sex = sex;
-        this.address = address;
+        this.preferredArea = preferredArea;
+        this.email = email;
     }
 }

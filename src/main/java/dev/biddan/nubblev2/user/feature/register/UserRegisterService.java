@@ -1,6 +1,5 @@
 package dev.biddan.nubblev2.user.feature.register;
 
-import dev.biddan.nubblev2.user.domain.Sex;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.error.exception.UserNicknameAlreadyExistsException;
 import dev.biddan.nubblev2.user.repository.UserRepository;
@@ -22,11 +21,11 @@ public class UserRegisterService {
         }
 
         User newUser = User.builder()
+                .loginId(command.loginId)
                 .nickname(command.nickname)
                 .password(command.password)
-                .birthYear(command.birthYear)
-                .sex(Sex.from(command.sex))
-                .address(command.address)
+                .preferredArea(command.preferredArea)
+                .email(command.email)
                 .build();
 
         return userRepository.save(newUser)
@@ -35,11 +34,11 @@ public class UserRegisterService {
 
     @Builder
     public record UserRegisterCommand(
+            String loginId,
             String nickname,
             String password,
-            Integer birthYear,
-            String sex,
-            String address
+            String preferredArea,
+            String email
     ) {
 
     }
