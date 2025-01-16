@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.error.exception.UserLoginIdAlreadyExistsException;
 import dev.biddan.nubblev2.user.error.exception.UserNicknameAlreadyExistsException;
+import dev.biddan.nubblev2.user.feature.register.UserRegisterService.UserRegisterCommand;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,13 +29,13 @@ class UserRegisterServiceTest {
     @Test
     void success() {
         // given
-        UserRegisterService.UserRegisterCommand command = new UserRegisterService.UserRegisterCommand(
-                "user123",
-                "nickname123",
-                "password123",
-                "경기도 군포시",
-                "user@email.com"
-        );
+        UserRegisterService.UserRegisterCommand command = UserRegisterCommand.builder()
+                .loginId("user123")
+                .nickname("user123")
+                .password("password123")
+                .preferredArea("경기도 군포시")
+                .email("user@email.com")
+                .build();
 
         // when
         Long newUserId = userRegisterService.register(command);
@@ -55,22 +56,23 @@ class UserRegisterServiceTest {
     @Test
     void throwException_whenUserLoginIdAlreadyExists() {
         // given
-        UserRegisterService.UserRegisterCommand existingCommand = new UserRegisterService.UserRegisterCommand(
-                "user123",
-                "nickname123",
-                "password123",
-                "경기도 군포시",
-                "user1@email.com"
-        );
+        UserRegisterService.UserRegisterCommand existingCommand = UserRegisterCommand.builder()
+                .loginId("user123")
+                .nickname("nickname123")
+                .password("password123")
+                .preferredArea("경기도 군포시")
+                .email("user1@email.com")
+                .build();
+
         userRegisterService.register(existingCommand);
 
-        UserRegisterService.UserRegisterCommand duplicateCommand = new UserRegisterService.UserRegisterCommand(
-                "user123",  // 중복된 loginId
-                "nickname456",
-                "password456",
-                "서울시 강남구",
-                "user2@email.com"
-        );
+        UserRegisterService.UserRegisterCommand duplicateCommand = UserRegisterCommand.builder()
+                        .loginId("user123") // 중복된 loginId
+                        .nickname("nickname456")
+                        .password("password456")
+                        .preferredArea("서울시 강남구")
+                        .email("user2@email.com")
+                        .build();
 
         // when & then
         assertThatThrownBy(() -> userRegisterService.register(duplicateCommand))
