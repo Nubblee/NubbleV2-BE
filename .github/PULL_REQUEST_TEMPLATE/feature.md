@@ -17,6 +17,8 @@
 <!-- 프론트엔드 개발자가 사용할 API 정보를 작성해주세요 -->
 ```
 [POST] /api/v1/endpoint
+Content-Type: application/json
+
 Request:
 {
     // 필수값은 *로 표시
@@ -25,11 +27,13 @@ Request:
 }
 
 Response:
+Content-Type: application/json
 {
     "field": "string"
 }
 
 Error:
+Content-Type: application/json
 {
     "code": "ERROR_CODE",    // 에러 코드
     "message": "에러 메시지"

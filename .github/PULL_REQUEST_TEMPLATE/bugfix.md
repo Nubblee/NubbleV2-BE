@@ -23,6 +23,8 @@
 ```
 // API 응답이나 스펙이 변경된 경우에만 작성해주세요
 [POST] /api/v1/endpoint
+Content-Type: application/json
+
 Request:
 {
     // 필수값은 *로 표시
@@ -31,11 +33,13 @@ Request:
 }
 
 Response:
+Content-Type: application/json
 {
     "field": "string"
 }
 
 Error:
+Content-Type: application/json
 {
     "code": "ERROR_CODE",    // 에러 코드
     "message": "에러 메시지"
