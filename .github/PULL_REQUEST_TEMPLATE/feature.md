@@ -26,17 +26,18 @@ Request:
     "optional": "string"   // 선택값
 }
 
-Response:
+Success Response:
 Content-Type: application/json
 {
     "field": "string"
 }
 
-Error:
+Error Response:
 Content-Type: application/json
 {
-    "code": "ERROR_CODE",    // 에러 코드
-    "message": "에러 메시지"
+    "code": "string",       // 에러 코드
+    "message": "string"     // 에러 메시지 
+    "timestamp": "string"   // 에러 발생 시간
 }
 ```
 
