@@ -1,4 +1,4 @@
-package dev.biddan.nubblev2.user.feature.register;
+package dev.biddan.nubblev2.user.service;
 
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.error.exception.UserLoginIdAlreadyExistsException;
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserRegisterService {
+public class UserService {
 
     private final UserRepository userRepository;
 

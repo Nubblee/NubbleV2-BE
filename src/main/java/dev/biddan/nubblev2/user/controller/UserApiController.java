@@ -1,6 +1,7 @@
-package dev.biddan.nubblev2.user.feature.register;
+package dev.biddan.nubblev2.user.controller;
 
-import dev.biddan.nubblev2.user.feature.register.UserRegisterService.UserRegisterCommand;
+import dev.biddan.nubblev2.user.service.UserService;
+import dev.biddan.nubblev2.user.service.UserService.UserRegisterCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class UserRegisterApiController {
+public class UserApiController {
 
-    private final UserRegisterService userRegisterService;
+    private final UserService userService;
 
     @PostMapping(value = "/api/users",
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<UserRegisterResponse> register(@RequestBody UserRegisterCommand request) {
-        Long newUserId = userRegisterService.register(request);
+        Long newUserId = userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new UserRegisterResponse(newUserId));
     }
