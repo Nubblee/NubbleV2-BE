@@ -11,7 +11,6 @@ import dev.biddan.nubblev2.AbstractIntegrationTest;
 import dev.biddan.nubblev2.user.controller.UserApiRequest;
 import dev.biddan.nubblev2.user.domain.User;
 import io.restassured.response.Response;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,13 +18,13 @@ import org.junit.jupiter.api.Test;
 class UserRegisterTest extends AbstractIntegrationTest {
 
     @Test
-    @DisplayName("정상 회원가입 후 중복 가입시 실패")
+    @DisplayName("회원가입 후 중복 가입시 409를 반환한다")
     void registerCompleteFlow() {
         // given: 회원가입할 정보 정의
-        UserApiRequest.Register request = generateValidUserRegisterRequest();
+        UserApiRequest.Register request = UserRequestFixture.generateValidUserRegisterRequest();
 
         // when & then: 1. 정상 회원가입
-        Response successResponse = userApiTestClient.register(request);
+        Response successResponse = UserApiTestClient.register(request);
 
         successResponse.then()
                 .statusCode(201)
@@ -43,7 +42,7 @@ class UserRegisterTest extends AbstractIntegrationTest {
         assertThat(savedUser.getPassword()).isNotEqualTo(request.password());
 
         // when & then: 2. 중복 가입 실패 (가장 중요한 중복 검증만)
-        userApiTestClient.register(request)
+        UserApiTestClient.register(request)
                 .then()
                 .statusCode(409)
                 .body("detail", anyOf(
@@ -53,18 +52,5 @@ class UserRegisterTest extends AbstractIntegrationTest {
 
         // then: DB에는 여전히 1명만 존재
         assertThat(userRepository.count()).isEqualTo(1);
-    }
-
-    private UserApiRequest.Register generateValidUserRegisterRequest() {
-        // 테스트 격리를 위해 랜덤값 사용
-        String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
-
-        return UserApiRequest.Register.builder()
-                .loginId("testuser_" + randomSuffix)
-                .nickname("테스트닉네임_" + randomSuffix)
-                .password("password123!")
-                .preferredArea("서울시 강남구")
-                .email("test_" + randomSuffix + "@example.com")
-                .build();
     }
 }

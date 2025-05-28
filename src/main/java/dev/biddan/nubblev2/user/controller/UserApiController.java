@@ -9,16 +9,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(path = "/api/v1/users")
 public class UserApiController {
 
     private final UserService userService;
 
-    @PostMapping(value = "/api/users",
-            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<UserApiResponse.Private> register(@RequestBody @Valid UserApiRequest.Register request) {
 
         UserInfo.Private info = userService.register(request.toCommand());
