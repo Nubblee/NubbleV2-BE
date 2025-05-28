@@ -50,6 +50,9 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
 
     testImplementation 'io.rest-assured:rest-assured'
+
+    // UPPER_CAMEL -> LOWER_UNDERSCORE convert
+    testImplementation 'com.google.guava:guava:33.2.1-jre'
 }
 
 tasks.named('test') {

@@ -1,6 +1,5 @@
 package dev.biddan.nubblev2.user;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
@@ -8,57 +7,16 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import dev.biddan.nubblev2.AbstractIntegrationTest;
 import dev.biddan.nubblev2.user.controller.UserApiRequest;
 import dev.biddan.nubblev2.user.domain.User;
-import dev.biddan.nubblev2.user.repository.UserRepository;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
 @DisplayName("회원가입 테스트")
-class UserRegisterTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
-            .withDatabaseName("testdb")
-            .withUsername("test")
-            .withPassword("test");
-
-    @DynamicPropertySource
-    static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
-
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    private UserApiTestClient userApiTestClient;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        userApiTestClient = new UserApiTestClient();
-        userRepository.deleteAll();
-    }
+class UserRegisterTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("정상 회원가입 후 중복 가입시 실패")
@@ -108,19 +66,5 @@ class UserRegisterTest {
                 .preferredArea("서울시 강남구")
                 .email("test_" + randomSuffix + "@example.com")
                 .build();
-    }
-
-    static class UserApiTestClient {
-
-        public Response register(UserApiRequest.Register request) {
-            return given()
-                    .contentType(ContentType.JSON)
-                    .body(request)
-                    .when()
-                    .post("/api/users")
-                    .then()
-                    .log().ifError()
-                    .extract().response();
-        }
     }
 }
