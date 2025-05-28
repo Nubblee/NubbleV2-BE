@@ -1,50 +1,33 @@
 package dev.biddan.nubblev2.user.service;
 
 import dev.biddan.nubblev2.user.domain.User;
-import dev.biddan.nubblev2.user.error.exception.UserLoginIdAlreadyExistsException;
-import dev.biddan.nubblev2.user.error.exception.UserNicknameAlreadyExistsException;
-import dev.biddan.nubblev2.user.repository.UserRepository;
-import lombok.Builder;
+import dev.biddan.nubblev2.user.service.dto.UserCommand;
+import dev.biddan.nubblev2.user.service.dto.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserDuplicateValidator userDuplicateValidator;
+    private final UserCreator userCreator;
+    private final PasswordHasher passwordHasher;
 
-    @Transactional
-    public Long register(UserRegisterCommand command) {
-        if (userRepository.existsByLoginId(command.loginId)) {
-            throw new UserLoginIdAlreadyExistsException(command.loginId);
-        }
+    public UserInfo.Private register(UserCommand.Register command) {
+        userDuplicateValidator.validate(command.loginId(), command.nickname());
 
-        if (userRepository.existsByNickname(command.nickname)) {
-            throw new UserNicknameAlreadyExistsException(command.nickname);
-        }
-
-        User newUser = User.builder()
-                .loginId(command.loginId)
-                .nickname(command.nickname)
-                .password(command.password)
-                .preferredArea(command.preferredArea)
-                .email(command.email)
+        String hashedPassword = passwordHasher.hash(command.password());
+        UserCommand.Register hashedPasswordCommand = UserCommand.Register.builder()
+                .loginId(command.loginId())
+                .nickname(command.nickname())
+                .password(hashedPassword)
+                .preferredArea(command.preferredArea())
+                .email(command.email())
                 .build();
 
-        return userRepository.save(newUser)
-                .getId();
-    }
+        User user = userCreator.create(hashedPasswordCommand);
 
-    @Builder
-    public record UserRegisterCommand(
-            String loginId,
-            String nickname,
-            String password,
-            String preferredArea,
-            String email
-    ) {
-
+        return UserInfo.Private.from(user);
     }
 }
