@@ -19,7 +19,7 @@ public class AuthSessionCreator {
     @Transactional
     public AuthSessionInfo.Basic create(Private privateUserInfo, String clientIp, String userAgent) {
         AuthSession newSession = new AuthSession(
-                String.valueOf(privateUserInfo.id()),
+                privateUserInfo.id(),
                 SESSION_EXPIRATION_HOURS
         );
 

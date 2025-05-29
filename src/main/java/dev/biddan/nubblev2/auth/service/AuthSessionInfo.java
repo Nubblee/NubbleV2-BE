@@ -9,7 +9,7 @@ public class AuthSessionInfo {
 
     @Builder
     public record Basic(
-            String userId,
+            Long userId,
             String sessionId,
             LocalDateTime expiresAt
     ) {

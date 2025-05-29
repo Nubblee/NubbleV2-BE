@@ -33,7 +33,7 @@ public class AuthSession {
     @Column(nullable = false, length = SESSION_ID_LENGTH, unique = true)
     private String sessionId;
 
-    private String userId;
+    private Long userId;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -44,7 +44,7 @@ public class AuthSession {
     @Column(name = "last_accessed_at", nullable = false)
     private LocalDateTime lastAccessedAt;
 
-    public AuthSession(String userId, int expirationHours) {
+    public AuthSession(Long userId, int expirationHours) {
         Assert.notNull(userId, "사용자는 필수입니다");
         this.userId = userId;
 
