@@ -8,10 +8,12 @@ import dev.biddan.nubblev2.user.controller.UserApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,5 +45,20 @@ public class AuthApiController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, sessionCookie.toString())
                 .body(new UserApiResponse.Private(loginResult.userInfo()));
+    }
+
+    @PostMapping(path = "/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME, required = false) String sessionId
+    ) {
+        if (sessionId != null) {
+            authService.logout(sessionId);
+        }
+
+        ResponseCookie expiredCookie = authSessionCookieManager.createExpiredSessionCookie();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+                .build();
     }
 }

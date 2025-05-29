@@ -19,4 +19,14 @@ public class AuthSessionCookieManager {
                 .secure(false)
                 .build();
     }
+
+    public ResponseCookie createExpiredSessionCookie() {
+        return ResponseCookie.from(AUTH_SESSION_COOKIE_NAME, "")
+                .httpOnly(true)
+                .path("/")
+                .sameSite(SameSite.LAX.toString())
+                .secure(false)
+                .maxAge(0)
+                .build();
+    }
 }
