@@ -22,7 +22,7 @@ public class UserApiController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<UserApiResponse.Private> register(@RequestBody @Valid UserApiRequest.Register request) {
 
-        UserInfo.Private info = userService.register(request.toCommand());
+        UserInfo.Private info = userService.register(request.toRegisterCommand());
 
         UserApiResponse.Private response = new UserApiResponse.Private(info);
 

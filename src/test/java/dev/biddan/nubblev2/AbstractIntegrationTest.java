@@ -1,5 +1,6 @@
 package dev.biddan.nubblev2;
 
+import dev.biddan.nubblev2.auth.repository.LoginLogRepository;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +17,9 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ActiveProfiles("test")
 public abstract class AbstractIntegrationTest {
 
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
     @LocalServerPort
     protected int port;
 
@@ -23,7 +27,7 @@ public abstract class AbstractIntegrationTest {
     protected UserRepository userRepository;
 
     @Autowired
-    private DatabaseCleaner databaseCleaner;
+    protected LoginLogRepository loginLogRepository;
 
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
 
