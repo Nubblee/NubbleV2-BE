@@ -2,6 +2,7 @@ package dev.biddan.nubblev2;
 
 import dev.biddan.nubblev2.auth.repository.AuthSessionRepository;
 import dev.biddan.nubblev2.auth.repository.LoginLogRepository;
+import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementRepository;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import io.restassured.RestAssured;
@@ -36,6 +37,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected StudyGroupRepository studyGroupRepository;
+
+    @Autowired
+    protected StudyAnnouncementRepository studyAnnouncementRepository;
 
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
 
