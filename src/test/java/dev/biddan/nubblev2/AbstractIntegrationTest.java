@@ -2,6 +2,7 @@ package dev.biddan.nubblev2;
 
 import dev.biddan.nubblev2.auth.repository.AuthSessionRepository;
 import dev.biddan.nubblev2.auth.repository.LoginLogRepository;
+import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.AfterEach;
@@ -32,6 +33,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected AuthSessionRepository authSessionRepository;
+
+    @Autowired
+    protected StudyGroupRepository studyGroupRepository;
 
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
 

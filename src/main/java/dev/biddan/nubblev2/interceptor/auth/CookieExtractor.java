@@ -1,5 +1,6 @@
 package dev.biddan.nubblev2.interceptor.auth;
 
+import dev.biddan.nubblev2.http.AuthSessionCookieManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -15,7 +16,7 @@ public class CookieExtractor {
         }
 
         for (Cookie cookie : cookies) {
-            if ("auth-session-id".equals(cookie.getName())) {
+            if (AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME.equals(cookie.getName())) {
                 String value = cookie.getValue();
                 return (value != null && !value.trim().isEmpty())
                         ? Optional.of(value.trim())
