@@ -12,6 +12,7 @@ import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ public class StudyGroupCreator {
     private final StudyGroupRepository studyGroupRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public StudyGroup create(StudyGroupCommand.Create command) {
         User creator = userRepository.findById(command.creatorId())
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다"));
