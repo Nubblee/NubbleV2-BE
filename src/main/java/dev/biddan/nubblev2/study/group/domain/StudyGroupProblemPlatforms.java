@@ -11,11 +11,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class StudyGroupProblemPlatforms {
 
     @ElementCollection(fetch = FetchType.LAZY)

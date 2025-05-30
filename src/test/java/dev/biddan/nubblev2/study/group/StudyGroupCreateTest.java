@@ -1,8 +1,10 @@
 package dev.biddan.nubblev2.study.group;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import dev.biddan.nubblev2.AbstractIntegrationTest;
@@ -15,6 +17,7 @@ import dev.biddan.nubblev2.user.UserRequestFixture;
 import dev.biddan.nubblev2.user.controller.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +50,7 @@ class StudyGroupCreateTest extends AbstractIntegrationTest {
     @DisplayName("유효한 정보로 스터디 그룹을 생성할 수 있다")
     void createStudyGroupWithValidData() {
         // given: 유효한 스터디 그룹 생성 요청
+        System.out.printf("userId: %s%n", userId.toString());
         StudyGroupApiRequest.Create request = StudyGroupRequestFixture.generateValidCreateRequest();
 
         // when: 스터디 그룹 생성
@@ -59,8 +63,8 @@ class StudyGroupCreateTest extends AbstractIntegrationTest {
                 .body("studyGroup.name", equalTo(request.name()))
                 .body("studyGroup.description", equalTo(request.description()))
                 .body("studyGroup.capacity", equalTo(request.capacity()))
-                .body("studyGroup.startDate", equalTo(request.startDate()))
-                .body("studyGroup.endDate", equalTo(request.endDate()))
+                .body("studyGroup.startDate", equalTo(request.startDate().toString()))
+                .body("studyGroup.endDate", equalTo(request.endDate().toString()))
                 .body("studyGroup.languages", hasItems(request.languages().toArray()))
                 .body("studyGroup.mainLanguage", equalTo(request.mainLanguage()))
                 .body("studyGroup.difficultyLevels", hasItems(request.difficultyLevels().toArray()))
@@ -68,7 +72,7 @@ class StudyGroupCreateTest extends AbstractIntegrationTest {
                 .body("studyGroup.meetingType", equalTo(request.meetingType()))
                 .body("studyGroup.meetingRegion", equalTo(request.meetingRegion()))
                 .body("studyGroup.mainMeetingDays", hasItems(request.mainMeetingDays().toArray()))
-                .body("studyGroup.creator.id", equalTo(userId))
+                .body("studyGroup.creator.id", equalTo(userId.intValue()))
                 .body("studyGroup.creator.nickname", notNullValue());
 
         // then: DB에 저장 확인

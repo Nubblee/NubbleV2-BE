@@ -50,7 +50,7 @@ public class StudyGroup {
     private StudyGroupProblemPlatforms problemPlatforms;
 
     @Embedded
-    private StudyGroupMeeting meetingInfo;
+    private StudyGroupMeeting meeting;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
@@ -73,7 +73,7 @@ public class StudyGroup {
         this.languages = new StudyGroupLanguages(languages, mainLanguage);
         this.difficultyLevels = new StudyGroupDifficultyLevels(difficultyLevels);
         this.problemPlatforms = new StudyGroupProblemPlatforms(problemPlatforms);
-        this.meetingInfo = new StudyGroupMeeting(meetingType, meetingRegion, mainMeetingDays);
+        this.meeting = new StudyGroupMeeting(meetingType, meetingRegion, mainMeetingDays);
     }
 
     public enum ProgrammingLanguage {

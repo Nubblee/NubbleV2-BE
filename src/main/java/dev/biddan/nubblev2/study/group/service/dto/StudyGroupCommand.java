@@ -22,5 +22,6 @@ public class StudyGroupCommand {
             List<String> mainMeetingDays,
             Long creatorId
     ) {
+
     }
 }
