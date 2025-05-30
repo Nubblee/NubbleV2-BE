@@ -1,7 +1,6 @@
 package dev.biddan.nubblev2.study.announcement;
 
 import static dev.biddan.nubblev2.http.AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -88,18 +87,18 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
             // then: 201 Created 응답과 공고 정보 반환
             response.then()
                     .statusCode(201)
-                    .body("announcement.id", notNullValue())
-                    .body("announcement.studyGroup.id", equalTo(studyGroupId.intValue()))
-                    .body("announcement.title", equalTo(request.title()))
-                    .body("announcement.description", equalTo(request.description()))
-                    .body("announcement.recruitCapacity", equalTo(request.recruitCapacity()))
-                    .body("announcement.status", equalTo("RECRUITING"))
-                    .body("announcement.closedReason", nullValue())
-                    .body("announcement.createdAt", notNullValue())
-                    .body("announcement.closedAt", nullValue());
+                    .body("studyAnnouncement.id", notNullValue())
+                    .body("studyAnnouncement.studyGroupId", equalTo(studyGroupId.intValue()))
+                    .body("studyAnnouncement.title", equalTo(request.title()))
+                    .body("studyAnnouncement.description", equalTo(request.description()))
+                    .body("studyAnnouncement.recruitCapacity", equalTo(request.recruitCapacity()))
+                    .body("studyAnnouncement.status", equalTo("RECRUITING"))
+                    .body("studyAnnouncement.closedReason", nullValue())
+                    .body("studyAnnouncement.createdAt", notNullValue())
+                    .body("studyAnnouncement.closedAt", nullValue());
 
             // then: DB에 저장 확인
-            Long announcementId = response.jsonPath().getLong("announcement.id");
+            Long announcementId = response.jsonPath().getLong("studyAnnouncement.id");
             assertThat(studyAnnouncementRepository.findById(announcementId)).isPresent();
         }
     }

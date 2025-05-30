@@ -14,5 +14,28 @@ public class StudyAnnouncementApiRequest {
             LocalDateTime startDateTime,
             LocalDateTime endDateTime
     ) {
+
+        public StudyAnnouncementCommand.Create toCreateCommand() {
+            return StudyAnnouncementCommand.Create.builder()
+                    .title(title)
+                    .description(description)
+                    .recruitCapacity(recruitCapacity)
+                    .startDateTime(startDateTime)
+                    .endDateTime(endDateTime)
+                    .build();
+        }
+    }
+
+    public class StudyAnnouncementCommand {
+
+        @Builder
+        public record Create(
+                String title,
+                String description,
+                Integer recruitCapacity,
+                LocalDateTime startDateTime,
+                LocalDateTime endDateTime
+        ) {
+        }
     }
 }
