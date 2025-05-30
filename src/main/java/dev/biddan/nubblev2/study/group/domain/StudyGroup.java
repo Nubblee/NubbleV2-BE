@@ -1,5 +1,6 @@
 package dev.biddan.nubblev2.study.group.domain;
 
+import dev.biddan.nubblev2.study.group.domain.StudyGroupUpdateBuilder.StudyGroupUpdateCommand;
 import dev.biddan.nubblev2.user.domain.User;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -16,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.util.Assert;
 
 @Entity
@@ -74,6 +76,50 @@ public class StudyGroup {
         this.difficultyLevels = new StudyGroupDifficultyLevels(difficultyLevels);
         this.problemPlatforms = new StudyGroupProblemPlatforms(problemPlatforms);
         this.meeting = new StudyGroupMeeting(meetingType, meetingRegion, mainMeetingDays);
+    }
+
+    public boolean isCreator(Long creatorId) {
+        return this.creator.getId().equals(creatorId);
+    }
+
+    public static StudyGroupUpdateBuilder updateBuilder() {
+        return new StudyGroupUpdateBuilder();
+    }
+
+    public void applyUpdate(StudyGroupUpdateCommand updateCommand) {
+        updateCommand.execute(this);
+    }
+
+    void updateName(StudyGroupName name) {
+        this.name = name;
+    }
+
+    void updateDescription(StudyGroupDescription description) {
+        this.description = description;
+    }
+
+    void updateCapacity(StudyGroupCapacity capacity) {
+        this.capacity = capacity;
+    }
+
+    void updatePeriod(StudyGroupPeriod period) {
+        this.period = period;
+    }
+
+    void updateLanguages(StudyGroupLanguages languages) {
+        this.languages = languages;
+    }
+
+    void updateDifficultyLevels(StudyGroupDifficultyLevels difficultyLevels) {
+        this.difficultyLevels = difficultyLevels;
+    }
+
+    void updateProblemPlatforms(StudyGroupProblemPlatforms problemPlatforms) {
+        this.problemPlatforms = problemPlatforms;
+    }
+
+    void updateMeeting(StudyGroupMeeting meeting) {
+        this.meeting = meeting;
     }
 
     public enum ProgrammingLanguage {

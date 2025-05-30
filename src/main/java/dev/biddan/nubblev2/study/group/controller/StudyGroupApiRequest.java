@@ -1,7 +1,6 @@
 package dev.biddan.nubblev2.study.group.controller;
 
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand;
-import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
@@ -53,6 +52,23 @@ public class StudyGroupApiRequest {
                     .meetingRegion(meetingRegion)
                     .mainMeetingDays(mainMeetingDays)
                     .creatorId(creatorUserId)
+                    .build();
+        }
+
+        public StudyGroupCommand.Update toUpdateCommand() {
+            return StudyGroupCommand.Update.builder()
+                    .name(name)
+                    .description(description)
+                    .capacity(capacity)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .languages(languages)
+                    .mainLanguage(mainLanguage)
+                    .difficultyLevels(difficultyLevels)
+                    .problemPlatforms(problemPlatforms)
+                    .meetingType(meetingType)
+                    .meetingRegion(meetingRegion)
+                    .mainMeetingDays(mainMeetingDays)
                     .build();
         }
     }

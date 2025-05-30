@@ -24,4 +24,22 @@ public class StudyGroupCommand {
     ) {
 
     }
+
+    @Builder
+    public record Update(
+            String name,
+            String description,
+            Integer capacity,
+            LocalDate startDate,
+            LocalDate endDate,
+            List<String> languages,
+            String mainLanguage,
+            List<String> difficultyLevels,
+            List<String> problemPlatforms,
+            String meetingType,
+            String meetingRegion,
+            List<String> mainMeetingDays
+    ) {
+
+    }
 }
