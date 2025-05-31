@@ -37,7 +37,7 @@ public class StudyGroupApiRequest {
             List<String> mainMeetingDays
     ) {
 
-        public StudyGroupCommand.Create toCreateCommand(Long creatorUserId) {
+        public StudyGroupCommand.Create toCreateCommand() {
             return StudyGroupCommand.Create.builder()
                     .name(name)
                     .description(description)
@@ -51,7 +51,6 @@ public class StudyGroupApiRequest {
                     .meetingType(meetingType)
                     .meetingRegion(meetingRegion)
                     .mainMeetingDays(mainMeetingDays)
-                    .creatorId(creatorUserId)
                     .build();
         }
 

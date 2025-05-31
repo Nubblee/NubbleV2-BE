@@ -1,7 +1,6 @@
 package dev.biddan.nubblev2.study.group.service;
 
 import dev.biddan.nubblev2.exception.http.BadRequestException;
-import dev.biddan.nubblev2.exception.http.NotFoundException;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.DifficultyLevel;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.MeetingDay;
@@ -9,7 +8,7 @@ import dev.biddan.nubblev2.study.group.domain.StudyGroup.MeetingType;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProblemPlatform;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProgrammingLanguage;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
-import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand;
+import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand.Create;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,10 +24,7 @@ public class StudyGroupCreator {
     private final UserRepository userRepository;
 
     @Transactional
-    public StudyGroup create(StudyGroupCommand.Create command) {
-        User creator = userRepository.findById(command.creatorId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다"));
-
+    public StudyGroup create(User creator, Create command) {
         StudyGroup newStudyGroup = StudyGroup.builder()
                 .name(command.name())
                 .description(command.description())

@@ -19,8 +19,7 @@ public class StudyGroupCommand {
             List<String> problemPlatforms,
             String meetingType,
             String meetingRegion,
-            List<String> mainMeetingDays,
-            Long creatorId
+            List<String> mainMeetingDays
     ) {
 
     }

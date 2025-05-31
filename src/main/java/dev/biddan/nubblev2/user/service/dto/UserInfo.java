@@ -24,4 +24,17 @@ public class UserInfo {
                     .build();
         }
     }
+
+    @Builder
+    public record Public(
+            Long id,
+            String nickname
+    ) {
+        public static Public from(User user) {
+            return Public.builder()
+                    .id(user.getId())
+                    .nickname(user.getNickname())
+                    .build();
+        }
+    }
 }

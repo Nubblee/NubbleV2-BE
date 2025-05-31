@@ -30,7 +30,7 @@ public class StudyGroupApiController {
             @RequestBody @Valid StudyGroupApiRequest.Create request,
             @CurrentUserId Long currentId
     ) {
-        StudyGroupInfo.Private info = studyGroupService.create(request.toCreateCommand(currentId));
+        StudyGroupInfo.Private info = studyGroupService.create(currentId, request.toCreateCommand());
 
         StudyGroupApiResponse.Private response = new StudyGroupApiResponse.Private(info);
 
