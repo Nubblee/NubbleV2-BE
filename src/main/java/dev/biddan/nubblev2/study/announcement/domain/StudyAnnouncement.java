@@ -34,16 +34,16 @@ public class StudyAnnouncement {
     private StudyGroup studyGroup;
 
     @Embedded
-    private StudyAnnouncementTitle title;
+    private AnnouncementTitle title;
 
     @Embedded
-    private StudyAnnouncementDescription description;
+    private AnnouncementDescription description;
 
     @Embedded
-    private StudyAnnouncementCapacity recruitCapacity;
+    private AnnouncementCapacity recruitCapacity;
 
     @Embedded
-    private StudyAnnouncementPeriod period;
+    private AnnouncementPeriod period;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -59,18 +59,22 @@ public class StudyAnnouncement {
     @Column(name = "closed_at")
     private LocalDateTime closedAt;
 
+    @Embedded
+    private AnnouncementApplicationForm announcementApplicationForm;
+
     @Builder
     public StudyAnnouncement(StudyGroup studyGroup, String title, String description,
-            Integer recruitCapacity, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+            Integer recruitCapacity, LocalDateTime startDateTime, LocalDateTime endDateTime, String applicationFormContent) {
         Assert.notNull(studyGroup, "스터디 그룹은 필수입니다");
         this.studyGroup = studyGroup;
 
-        this.title = new StudyAnnouncementTitle(title);
-        this.description = new StudyAnnouncementDescription(description);
-        this.recruitCapacity = new StudyAnnouncementCapacity(recruitCapacity);
-        this.period = new StudyAnnouncementPeriod(startDateTime, endDateTime, studyGroup);
+        this.title = new AnnouncementTitle(title);
+        this.description = new AnnouncementDescription(description);
+        this.recruitCapacity = new AnnouncementCapacity(recruitCapacity);
+        this.period = new AnnouncementPeriod(startDateTime, endDateTime, studyGroup);
         this.status = AnnouncementStatus.RECRUITING;
         this.createdAt = LocalDateTime.now();
+        this.announcementApplicationForm = new AnnouncementApplicationForm(applicationFormContent);
     }
 
     public enum AnnouncementStatus {

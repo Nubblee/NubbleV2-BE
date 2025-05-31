@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class StudyAnnouncementCapacity {
+public class AnnouncementCapacity {
 
     private static final int MIN_VALUE = 1;
     private static final int MAX_VALUE = 100;
@@ -18,7 +18,7 @@ public class StudyAnnouncementCapacity {
     @Column(name = "recruit_capacity", nullable = false)
     private Integer value;
 
-    public StudyAnnouncementCapacity(Integer value) {
+    public AnnouncementCapacity(Integer value) {
         validate(value);
         this.value = value;
     }

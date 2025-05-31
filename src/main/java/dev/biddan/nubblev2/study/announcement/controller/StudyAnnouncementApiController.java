@@ -2,6 +2,7 @@ package dev.biddan.nubblev2.study.announcement.controller;
 
 import dev.biddan.nubblev2.argument.userid.CurrentUserId;
 import dev.biddan.nubblev2.interceptor.auth.AuthRequired;
+import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementApiRequest;
 import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementApiResponse;
 import dev.biddan.nubblev2.study.announcement.service.StudyAnnouncementService;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;

@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.nullValue;
 import dev.biddan.nubblev2.AbstractIntegrationTest;
 import dev.biddan.nubblev2.auth.AuthApiTestClient;
 import dev.biddan.nubblev2.auth.controller.AuthApiRequest;
-import dev.biddan.nubblev2.study.announcement.controller.StudyAnnouncementApiRequest;
+import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementApiRequest;
 import dev.biddan.nubblev2.study.group.StudyGroupApiTestClient;
 import dev.biddan.nubblev2.study.group.StudyGroupRequestFixture;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
@@ -95,7 +95,8 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
                     .body("studyAnnouncement.status", equalTo("RECRUITING"))
                     .body("studyAnnouncement.closedReason", nullValue())
                     .body("studyAnnouncement.createdAt", notNullValue())
-                    .body("studyAnnouncement.closedAt", nullValue());
+                    .body("studyAnnouncement.closedAt", nullValue())
+                    .body("studyAnnouncement.applicationForm", equalTo(request.applicationFormContent()));
 
             // then: DB에 저장 확인
             Long announcementId = response.jsonPath().getLong("studyAnnouncement.id");
@@ -197,6 +198,7 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
                     .recruitCapacity(15) // 스터디 그룹 정원(10명)보다도 많음
                     .startDateTime(LocalDateTime.now())
                     .endDateTime(studyGroupEndDate.atTime(20, 0))
+                    .applicationFormContent("자유 기입: ")
                     .build();
 
             // when & then: 정원 초과 모집으로 공고 생성 시도

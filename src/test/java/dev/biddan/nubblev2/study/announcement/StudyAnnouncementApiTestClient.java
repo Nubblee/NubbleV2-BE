@@ -3,7 +3,7 @@ package dev.biddan.nubblev2.study.announcement;
 import static dev.biddan.nubblev2.http.AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME;
 import static io.restassured.RestAssured.given;
 
-import dev.biddan.nubblev2.study.announcement.controller.StudyAnnouncementApiRequest;
+import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementApiRequest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 

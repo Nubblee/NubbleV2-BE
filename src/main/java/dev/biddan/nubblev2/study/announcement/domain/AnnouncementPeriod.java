@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class StudyAnnouncementPeriod {
+public class AnnouncementPeriod {
 
     @Column(name = "start_date_time", nullable = false)
     private LocalDateTime startDateTime;
@@ -21,7 +21,7 @@ public class StudyAnnouncementPeriod {
     @Column(name = "end_date_time", nullable = false)
     private LocalDateTime endDateTime;
 
-    public StudyAnnouncementPeriod(LocalDateTime startDateTime, LocalDateTime endDateTime, StudyGroup studyGroup) {
+    public AnnouncementPeriod(LocalDateTime startDateTime, LocalDateTime endDateTime, StudyGroup studyGroup) {
         validate(startDateTime, endDateTime, studyGroup);
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;

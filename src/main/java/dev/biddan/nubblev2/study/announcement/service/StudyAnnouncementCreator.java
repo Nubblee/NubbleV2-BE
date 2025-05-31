@@ -1,8 +1,8 @@
 package dev.biddan.nubblev2.study.announcement.service;
 
-import dev.biddan.nubblev2.study.announcement.controller.StudyAnnouncementApiRequest.StudyAnnouncementCommand;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
 import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementRepository;
+import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,6 +23,7 @@ public class StudyAnnouncementCreator {
                 .recruitCapacity(createCommand.recruitCapacity())
                 .startDateTime(createCommand.startDateTime())
                 .endDateTime(createCommand.endDateTime())
+                .applicationFormContent(createCommand.applicationFormContent())
                 .build();
 
         return studyAnnouncementRepository.save(newAnnouncement);

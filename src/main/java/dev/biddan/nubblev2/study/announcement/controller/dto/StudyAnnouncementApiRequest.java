@@ -1,5 +1,6 @@
-package dev.biddan.nubblev2.study.announcement.controller;
+package dev.biddan.nubblev2.study.announcement.controller.dto;
 
+import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
 import java.time.LocalDateTime;
 import lombok.Builder;
 
@@ -12,7 +13,8 @@ public class StudyAnnouncementApiRequest {
             String description,
             Integer recruitCapacity,
             LocalDateTime startDateTime,
-            LocalDateTime endDateTime
+            LocalDateTime endDateTime,
+            String applicationFormContent
     ) {
 
         public StudyAnnouncementCommand.Create toCreateCommand() {
@@ -22,20 +24,8 @@ public class StudyAnnouncementApiRequest {
                     .recruitCapacity(recruitCapacity)
                     .startDateTime(startDateTime)
                     .endDateTime(endDateTime)
+                    .applicationFormContent(applicationFormContent)
                     .build();
-        }
-    }
-
-    public class StudyAnnouncementCommand {
-
-        @Builder
-        public record Create(
-                String title,
-                String description,
-                Integer recruitCapacity,
-                LocalDateTime startDateTime,
-                LocalDateTime endDateTime
-        ) {
         }
     }
 }

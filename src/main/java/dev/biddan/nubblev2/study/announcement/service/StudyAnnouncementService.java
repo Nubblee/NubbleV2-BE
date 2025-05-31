@@ -2,8 +2,8 @@ package dev.biddan.nubblev2.study.announcement.service;
 
 import dev.biddan.nubblev2.exception.http.ForbiddenException;
 import dev.biddan.nubblev2.exception.http.NotFoundException;
-import dev.biddan.nubblev2.study.announcement.controller.StudyAnnouncementApiRequest.StudyAnnouncementCommand;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
+import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
@@ -20,7 +20,9 @@ public class StudyAnnouncementService {
     private final StudyAnnouncementDuplicateValidator duplicateValidator;
 
     @Transactional
-    public StudyAnnouncementInfo.Basic create(Long studyGroupId, Long currentUserId,
+    public StudyAnnouncementInfo.Basic create(
+            Long studyGroupId,
+            Long currentUserId,
             StudyAnnouncementCommand.Create createCommand) {
         StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 스터디 그룹입니다"));

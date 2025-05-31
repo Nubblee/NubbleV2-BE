@@ -10,14 +10,14 @@ import org.springframework.util.Assert;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class StudyAnnouncementDescription {
+public class AnnouncementDescription {
 
     private static final int MAX_LENGTH = 2000;
 
     @Column(name = "description", nullable = false, length = MAX_LENGTH)
     private String value;
 
-    public StudyAnnouncementDescription(String value) {
+    public AnnouncementDescription(String value) {
         validate(value);
         this.value = value;
     }
