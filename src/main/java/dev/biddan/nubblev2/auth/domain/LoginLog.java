@@ -2,6 +2,7 @@ package dev.biddan.nubblev2.auth.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -13,11 +14,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "login_logs")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 public class LoginLog {
 
     private static final int LOGIN_ID_MAX_LENGTH = 20;
@@ -45,7 +49,8 @@ public class LoginLog {
     @Column(name = "failure_reason", length = FAILURE_REASON_MAX_LENGTH)
     private String failureReason;
 
-    @Column(name = "attempted_at", nullable = false)
+    @Column(name = "attempted_at", nullable = false, updatable = false)
+    @CreatedDate
     private LocalDateTime attemptedAt;
 
     private String authSessionId;

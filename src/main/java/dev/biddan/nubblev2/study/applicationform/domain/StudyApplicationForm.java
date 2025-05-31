@@ -5,6 +5,7 @@ import dev.biddan.nubblev2.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -18,11 +19,14 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "study_application_forms")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class StudyApplicationForm {
 
     @Id
@@ -48,6 +52,7 @@ public class StudyApplicationForm {
     private ApplicationFormRejectionReason rejectionReason;
 
     @Column(name = "submitted_at", nullable = false)
+    @CreatedDate
     private LocalDateTime submittedAt;
 
     @Embedded
@@ -64,7 +69,6 @@ public class StudyApplicationForm {
 
         this.content = new ApplicationFormContent(content);
         this.status = ApplicationFormStatus.SUBMITTED;
-        this.submittedAt = LocalDateTime.now();
     }
 
     public enum ApplicationFormStatus {

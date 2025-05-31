@@ -4,7 +4,6 @@ import static dev.biddan.nubblev2.http.AuthSessionCookieManager.AUTH_SESSION_COO
 import static io.restassured.RestAssured.given;
 
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
-import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest.Create;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 

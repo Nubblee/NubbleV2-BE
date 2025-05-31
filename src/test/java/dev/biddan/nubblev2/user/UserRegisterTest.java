@@ -31,7 +31,8 @@ class UserRegisterTest extends AbstractIntegrationTest {
                 .body("user.id", notNullValue())
                 .body("user.loginId", equalTo(request.loginId()))
                 .body("user.nickname", equalTo(request.nickname()))
-                .body("user.password", nullValue()); // 비밀번호 노출 안됨
+                .body("user.password", nullValue())
+                .body("user.createdAt", notNullValue()); // 비밀번호 노출 안됨
 
         // then: DB에 저장 확인
         Long userId = successResponse.jsonPath().getLong("user.id");

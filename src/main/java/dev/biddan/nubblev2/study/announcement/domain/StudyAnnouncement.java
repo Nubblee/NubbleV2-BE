@@ -4,6 +4,7 @@ import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -17,12 +18,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "study_announcements")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 public class StudyAnnouncement {
 
     @Id
@@ -53,7 +57,8 @@ public class StudyAnnouncement {
     @Column(name = "closed_reason")
     private ClosedReason closedReason;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreatedDate
     private LocalDateTime createdAt;
 
     @Column(name = "closed_at")
@@ -73,7 +78,6 @@ public class StudyAnnouncement {
         this.recruitCapacity = new AnnouncementCapacity(recruitCapacity);
         this.period = new AnnouncementPeriod(startDateTime, endDateTime, studyGroup);
         this.status = AnnouncementStatus.RECRUITING;
-        this.createdAt = LocalDateTime.now();
         this.announcementApplicationForm = new AnnouncementApplicationForm(applicationFormContent);
     }
 

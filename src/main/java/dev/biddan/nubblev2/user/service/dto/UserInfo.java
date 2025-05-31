@@ -1,6 +1,7 @@
 package dev.biddan.nubblev2.user.service.dto;
 
 import dev.biddan.nubblev2.user.domain.User;
+import java.time.LocalDateTime;
 import lombok.Builder;
 
 public class UserInfo {
@@ -11,7 +12,8 @@ public class UserInfo {
             String loginId,
             String nickname,
             String preferredArea,
-            String email
+            String email,
+            LocalDateTime createdAt
     ) {
 
         public static Private from(User user) {
@@ -21,6 +23,7 @@ public class UserInfo {
                     .nickname(user.getNickname())
                     .preferredArea(user.getPreferredArea())
                     .email(user.getEmail())
+                    .createdAt(user.getCreatedAt())
                     .build();
         }
     }

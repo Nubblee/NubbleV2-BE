@@ -2,8 +2,10 @@ package dev.biddan.nubblev2.study.group.domain;
 
 import dev.biddan.nubblev2.study.group.domain.StudyGroupUpdateBuilder.StudyGroupUpdateCommand;
 import dev.biddan.nubblev2.user.domain.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,13 +19,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "study_groups")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 public class StudyGroup {
 
     @Id
@@ -53,6 +57,10 @@ public class StudyGroup {
 
     @Embedded
     private StudyGroupMeeting meeting;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false,  updatable = false)
+    private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
