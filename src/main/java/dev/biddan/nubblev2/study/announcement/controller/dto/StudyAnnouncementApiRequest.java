@@ -2,6 +2,7 @@ package dev.biddan.nubblev2.study.announcement.controller.dto;
 
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Builder;
 
 public class StudyAnnouncementApiRequest {
@@ -27,5 +28,14 @@ public class StudyAnnouncementApiRequest {
                     .applicationFormContent(applicationFormContent)
                     .build();
         }
+    }
+
+    @Builder
+    public record FindList(
+            List<String> announcementStatuses,
+            Integer page,
+            Integer size
+    ) {
+
     }
 }

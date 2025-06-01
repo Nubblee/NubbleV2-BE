@@ -9,7 +9,6 @@ public class StudyAnnouncementRequestFixture {
     public static StudyAnnouncementApiRequest.Create generateValidCreateRequest(Long studyGroupId,
             LocalDate studyGroupEndDate) {
         LocalDateTime now = LocalDateTime.now();
-        // 스터디 그룹 종료일보다 하루 이른 마감일로 설정
         LocalDateTime safeEndDateTime = studyGroupEndDate.minusDays(1).atTime(23, 59, 59);
 
         return StudyAnnouncementApiRequest.Create.builder()
@@ -20,7 +19,8 @@ public class StudyAnnouncementRequestFixture {
                 .recruitCapacity(5)
                 .startDateTime(now)
                 .endDateTime(safeEndDateTime)
-                .applicationFormContent("알고리즘 학습 경험:\n지원 동기:\n사용 가능한 프로그래밍 언어:\n코딩테스트 풀이 경험:\n참여 가능 시간:\n주당 투자 가능 시간:\n")
+                .applicationFormContent(
+                        "알고리즘 학습 경험:\n지원 동기:\n사용 가능한 프로그래밍 언어:\n코딩테스트 풀이 경험:\n참여 가능 시간:\n주당 투자 가능 시간:\n")
                 .build();
     }
 }
