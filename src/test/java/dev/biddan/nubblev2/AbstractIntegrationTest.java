@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -18,6 +19,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@Import(TestClockConfig.class)
 public abstract class AbstractIntegrationTest {
 
     @Autowired
@@ -41,6 +43,10 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected StudyAnnouncementRepository studyAnnouncementRepository;
 
+    @Autowired
+    protected FixableClock systemClock;
+
+
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
 
     static {
@@ -62,5 +68,6 @@ public abstract class AbstractIntegrationTest {
     @AfterEach
     void destroy() {
         databaseCleaner.cleanDatabase();
+        systemClock.reset();
     }
 }
