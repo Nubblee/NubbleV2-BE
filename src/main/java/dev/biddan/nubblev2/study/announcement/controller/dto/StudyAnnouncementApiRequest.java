@@ -29,13 +29,4 @@ public class StudyAnnouncementApiRequest {
                     .build();
         }
     }
-
-    @Builder
-    public record FindList(
-            List<String> announcementStatuses,
-            Integer page,
-            Integer size
-    ) {
-
-    }
 }

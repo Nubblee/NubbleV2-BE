@@ -14,7 +14,7 @@ public class StudyGroupName {
 
     private static final int MAX_LENGTH = 50;
 
-    @Column(name = "name", nullable = false, length = MAX_LENGTH)
+    @Column(name = "nickname", nullable = false, length = MAX_LENGTH)
     private String value;
 
     public StudyGroupName(String value) {

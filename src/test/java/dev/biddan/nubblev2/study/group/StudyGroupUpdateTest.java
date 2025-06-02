@@ -85,7 +85,7 @@ class StudyGroupUpdateTest extends AbstractIntegrationTest {
             // then: 200 OK 응답
             response.then()
                     .statusCode(200)
-                    .body("studyGroup.name", equalTo("부분 업데이트된 스터디"))
+                    .body("studyGroup.nickname", equalTo("부분 업데이트된 스터디"))
                     .body("studyGroup.capacity", equalTo(20))
                     .body("studyGroup.description", equalTo(originalDescription));
         }

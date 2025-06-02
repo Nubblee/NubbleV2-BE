@@ -8,7 +8,6 @@ import dev.biddan.nubblev2.auth.AuthApiTestClient;
 import dev.biddan.nubblev2.auth.controller.AuthApiRequest;
 import dev.biddan.nubblev2.http.AuthSessionCookieManager;
 import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementApiRequest;
-import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementApiRequest.FindList;
 import dev.biddan.nubblev2.study.group.StudyGroupApiTestClient;
 import dev.biddan.nubblev2.study.group.StudyGroupRequestFixture;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
@@ -74,12 +73,8 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 }
             }
 
-            // given: 쿼리 요청
-            FindList request = FindList.builder()
-                    .build();
-
             // when: 공고 목록 조회
-            Response listResponse = StudyAnnouncementApiTestClient.findList(request);
+            Response listResponse = StudyAnnouncementApiTestClient.findList(null, null, null);
 
             // then: 최신순으로 정렬되어 조회됨 (4번 -> 3번 -> 2번 -> 1번 -> 0번)
             listResponse.then()
@@ -106,17 +101,13 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 announcementIds.add(announcementId);
             }
 
-            // given: 쿼리 요청
-            FindList request = FindList.builder()
-                    .build();
-
             // when: 목록 조회
-            Response listResponse = StudyAnnouncementApiTestClient.findList(request);
+            Response listResponse = StudyAnnouncementApiTestClient.findList(null, null, null);
 
             // then: 시간이 같으므로 ID가 빠른 순으로 정렬됨
             listResponse.then()
                     .statusCode(200)
-                    .body("announcements", hasSize(5))
+                    .body("announcements", hasSize(3))
                     .body("announcements[0].id", equalTo(announcementIds.get(0).intValue()))
                     .body("announcements[1].id", equalTo(announcementIds.get(1).intValue()))
                     .body("announcements[2].id", equalTo(announcementIds.get(2).intValue()));
@@ -146,13 +137,8 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
 
             // todo: 1개의 공고를 마감시켜야 함
 
-            // given: 쿼리 요청
-            FindList request = FindList.builder()
-                    .announcementStatuses(List.of("RECRUITING"))
-                    .build();
-
             // when: RECRUITING 상태만 필터링 조회
-            Response response = StudyAnnouncementApiTestClient.findList(request);
+            Response response = StudyAnnouncementApiTestClient.findList(List.of("RECRUITING"),  null, null);
 
             // then: RECRUITING 상태의 공고만 조회됨
             response.then()
@@ -181,13 +167,8 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
 
             // todo: 2개의 공고를 마감시켜야 함
 
-            // given: 쿼리 요청
-            FindList request = FindList.builder()
-                    .announcementStatuses(List.of("RECRUITING", "CLOSED"))
-                    .build();
-
             // when: RECRUITING과 CLOSED 모두 조회
-            Response response = StudyAnnouncementApiTestClient.findList(request);
+            Response response = StudyAnnouncementApiTestClient.findList(List.of("RECRUITING", "CLOSED"), null, null);
 
             // then: 모든 공고가 최신순으로 조회됨
             response.then()
@@ -213,19 +194,15 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
 
             // todo: 2개의 공고를 마감시켜야 함
 
-            // given: 쿼리 요청
-            FindList request = FindList.builder()
-                    .build();
-
             // when: 필터 없이 전체 조회
-            Response response = StudyAnnouncementApiTestClient.findList(request);
+            Response response = StudyAnnouncementApiTestClient.findList(null, null, null);
 
             // then: 모든 공고가 최신순으로 조회됨
             response.then()
                     .statusCode(200)
                     .body("announcements", hasSize(4))
-                    .body("currentPage", equalTo(0))
-                    .body("totalElements", equalTo(4));
+                    .body("meta.page", equalTo(1))
+                    .body("meta.totalSize", equalTo(4));
         }
 
     }
@@ -247,40 +224,31 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 systemClock.advanceTime(Duration.ofMinutes(10));
             }
 
-            // given: 쿼리 요청
-            FindList firstRequest = FindList.builder()
-                    .build();
-
-            // when: 첫 번째 페이지 조회 (기본값: page=0, size=20)
-            Response firstPageResponse = StudyAnnouncementApiTestClient.findList(firstRequest);
+            // when: 첫 번째 페이지 조회 (기본값: page=1, size=20)
+            Response firstPageResponse = StudyAnnouncementApiTestClient.findList(null, null, null);
 
             // then: 첫 번째 페이지 검증
             firstPageResponse.then()
                     .statusCode(200)
                     .body("announcements", hasSize(20))
-                    .body("currentPage", equalTo(0))
-                    .body("totalPages", equalTo(2))
-                    .body("totalElements", equalTo(25))
-                    .body("hasNext", equalTo(true))
-                    .body("hasPrevious", equalTo(false));
-
-            // given: 쿼리 요청
-            FindList secondRequest = FindList.builder()
-                    .page(1)
-                    .build();
+                    .body("meta.page", equalTo(1))
+                    .body("meta.totalPages", equalTo(2))
+                    .body("meta.totalSize", equalTo(25))
+                    .body("meta.hasNext", equalTo(true))
+                    .body("meta.hasPrevious", equalTo(false));
 
             // when: 두 번째 페이지 조회
-            Response secondPageResponse = StudyAnnouncementApiTestClient.findList(secondRequest);
+            Response secondPageResponse = StudyAnnouncementApiTestClient.findList(null, 2, null);
 
             // then: 두 번째 페이지 검증
             secondPageResponse.then()
                     .statusCode(200)
                     .body("announcements", hasSize(5))
-                    .body("currentPage", equalTo(1))
-                    .body("totalPages", equalTo(2))
-                    .body("totalElements", equalTo(25))
-                    .body("hasNext", equalTo(false))
-                    .body("hasPrevious", equalTo(true));
+                    .body("meta.page", equalTo(2))
+                    .body("meta.totalPages", equalTo(2))
+                    .body("meta.totalSize", equalTo(25))
+                    .body("meta.hasNext", equalTo(false))
+                    .body("meta.hasPrevious", equalTo(true));
         }
 
         @Test
@@ -296,24 +264,18 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 systemClock.advanceTime(Duration.ofMinutes(5));
             }
 
-            // given: 쿼리 요청
-            FindList request = FindList.builder()
-                    .page(0)
-                    .size(5)
-                    .build();
-
             // when: 페이지 크기 5로 첫 번째 페이지 조회
-            Response response = StudyAnnouncementApiTestClient.findList(request);
+            Response response = StudyAnnouncementApiTestClient.findList(List.of(), 1, 5);
 
             // then: 페이징 정보 검증
             response.then()
                     .statusCode(200)
                     .body("announcements", hasSize(5))
-                    .body("currentPage", equalTo(0))
-                    .body("totalPages", equalTo(3))
-                    .body("totalElements", equalTo(15))
-                    .body("hasNext", equalTo(true))
-                    .body("hasPrevious", equalTo(false));
+                    .body("meta.page", equalTo(1))
+                    .body("meta.totalPages", equalTo(3))
+                    .body("meta.totalSize", equalTo(15))
+                    .body("meta.hasNext", equalTo(true))
+                    .body("meta.hasPrevious", equalTo(false));
         }
 
         @Test
@@ -329,24 +291,18 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 systemClock.advanceTime(Duration.ofMinutes(10));
             }
 
-            // given: 쿼리 요청
-            FindList request = FindList.builder()
-                    .page(2)
-                    .size(10)
-                    .build();
-
             // when: 존재하지 않는 페이지 요청 (page=2, size=10)
-            Response response = StudyAnnouncementApiTestClient.findList(request);
+            Response response = StudyAnnouncementApiTestClient.findList(null, 2, 10);
 
             // then: 빈 결과 반환
             response.then()
                     .statusCode(200)
                     .body("announcements", hasSize(0))
-                    .body("currentPage", equalTo(2))
-                    .body("totalPages", equalTo(1))
-                    .body("totalElements", equalTo(5))
-                    .body("hasNext", equalTo(false))
-                    .body("hasPrevious", equalTo(true));
+                    .body("meta.page", equalTo(2))
+                    .body("meta.totalPages", equalTo(1))
+                    .body("meta.totalSize", equalTo(5))
+                    .body("meta.hasNext", equalTo(false))
+                    .body("meta.hasPrevious", equalTo(true));
         }
 
     }
@@ -359,7 +315,7 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
 
     private Long createAnnouncement(Long studyGroupId) {
         StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture
-                .generateValidCreateRequest(studyGroupId, LocalDate.now());
+                .generateValidCreateRequest(studyGroupId, LocalDate.now().plusDays(1));
         Response response = StudyAnnouncementApiTestClient.create(request, ownerAuthSessionId);
         return response.jsonPath().getLong("studyAnnouncement.id");
     }

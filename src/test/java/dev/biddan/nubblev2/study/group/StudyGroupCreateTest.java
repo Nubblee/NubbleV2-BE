@@ -60,7 +60,7 @@ class StudyGroupCreateTest extends AbstractIntegrationTest {
         response.then()
                 .statusCode(201)
                 .body("studyGroup.id", notNullValue())
-                .body("studyGroup.name", equalTo(request.name()))
+                .body("studyGroup.nickname", equalTo(request.name()))
                 .body("studyGroup.description", equalTo(request.description()))
                 .body("studyGroup.capacity", equalTo(request.capacity()))
                 .body("studyGroup.startDate", equalTo(request.startDate().toString()))

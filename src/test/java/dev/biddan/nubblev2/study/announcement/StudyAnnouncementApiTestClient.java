@@ -7,6 +7,7 @@ import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementAp
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.List;
 
 public class StudyAnnouncementApiTestClient {
 
@@ -22,12 +23,24 @@ public class StudyAnnouncementApiTestClient {
                 .extract().response();
     }
 
-    public static Response findList(StudyAnnouncementApiRequest.FindList request) {
-        return given()
-                .contentType(ContentType.JSON)
-                .body(request)
+    public static Response findList(List<String> statuses, Integer page, Integer size) {
+        RequestSpecification requestSpec = given();
+
+        if (statuses != null) {
+            requestSpec.queryParam("statuses", statuses);
+        }
+
+        if (page != null) {
+            requestSpec = requestSpec.queryParam("page", page);
+        }
+
+        if (size != null) {
+            requestSpec = requestSpec.queryParam("size", size);
+        }
+
+        return requestSpec
                 .when()
-                .post("/api/v1/study-announcements")
+                .get("/api/v1/study-announcements")
                 .then()
                 .log().ifError()
                 .extract().response();

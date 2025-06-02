@@ -52,6 +52,7 @@ dependencies {
     implementation "com.blazebit:blaze-persistence-entity-view-impl-jakarta:$blazePersistenceVersion"
     implementation "com.blazebit:blaze-persistence-integration-hibernate-6.2:$blazePersistenceVersion"
     implementation "com.blazebit:blaze-persistence-integration-spring-data-3.3:$blazePersistenceVersion"
+    implementation "com.blazebit:blaze-persistence-integration-spring-data-webmvc-jakarta:$blazePersistenceVersion"
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
