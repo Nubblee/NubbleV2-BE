@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class DatabaseCleaner implements InitializingBean {
 
+    private static final Set<String> INTERNAL_ENTITY_TABLE_NAMES_TO_EXCLUDE = Set.of("values_entity");
+
     @Autowired
     private EntityManager entityManager;
 
@@ -24,6 +26,7 @@ public class DatabaseCleaner implements InitializingBean {
     public void afterPropertiesSet() {
         tableNames = entityManager.getMetamodel().getEntities().stream()
                 .map(this::getTableName)
+                .filter(tableName -> !INTERNAL_ENTITY_TABLE_NAMES_TO_EXCLUDE.contains(tableName))
                 .collect(Collectors.toUnmodifiableSet());
     }
 
