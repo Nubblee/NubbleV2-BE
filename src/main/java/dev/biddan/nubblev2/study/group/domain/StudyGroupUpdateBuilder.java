@@ -5,7 +5,6 @@ import dev.biddan.nubblev2.study.group.domain.StudyGroup.MeetingDay;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.MeetingType;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProblemPlatform;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProgrammingLanguage;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +37,6 @@ public class StudyGroupUpdateBuilder {
         return this;
     }
 
-    public StudyGroupUpdateBuilder period(LocalDate startDate, LocalDate endDate) {
-        if (startDate != null && endDate != null) {
-            commands.add(studyGroup -> studyGroup.updatePeriod(new StudyGroupPeriod(startDate, endDate)));
-        }
-        return this;
-    }
-
     public StudyGroupUpdateBuilder languages(List<ProgrammingLanguage> languages, ProgrammingLanguage mainLanguage) {
         if (languages != null && mainLanguage != null) {
             commands.add(studyGroup -> studyGroup.updateLanguages(new StudyGroupLanguages(languages, mainLanguage)));
@@ -68,9 +60,11 @@ public class StudyGroupUpdateBuilder {
         return this;
     }
 
-    public StudyGroupUpdateBuilder meeting(MeetingType meetingType, String meetingRegion, List<MeetingDay> mainMeetingDays) {
+    public StudyGroupUpdateBuilder meeting(MeetingType meetingType, String meetingRegion,
+            List<MeetingDay> mainMeetingDays) {
         if (meetingType != null && mainMeetingDays != null) {
-            commands.add(studyGroup -> studyGroup.updateMeeting(new StudyGroupMeeting(meetingType, meetingRegion, mainMeetingDays)));
+            commands.add(studyGroup -> studyGroup.updateMeeting(
+                    new StudyGroupMeeting(meetingType, meetingRegion, mainMeetingDays)));
         }
         return this;
     }
@@ -81,6 +75,7 @@ public class StudyGroupUpdateBuilder {
 
     @FunctionalInterface
     public interface StudyGroupUpdateCommand {
+
         void execute(StudyGroup studyGroup);
     }
 }

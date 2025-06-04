@@ -3,6 +3,7 @@ package dev.biddan.nubblev2.study.announcement.service.dto;
 import dev.biddan.nubblev2.study.announcement.domain.AnnouncementApplicationForm;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement.ClosedReason;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 
@@ -15,8 +16,7 @@ public class StudyAnnouncementInfo {
             String title,
             String description,
             Integer recruitCapacity,
-            LocalDateTime startDateTime,
-            LocalDateTime endDateTime,
+            LocalDate endDate,
             String status,
             String closedReason,
             LocalDateTime createdAt,
@@ -31,8 +31,7 @@ public class StudyAnnouncementInfo {
                     .title(announcement.getTitle().getValue())
                     .description(announcement.getDescription().getValue())
                     .recruitCapacity(announcement.getRecruitCapacity().getValue())
-                    .startDateTime(announcement.getPeriod().getStartDateTime())
-                    .endDateTime(announcement.getPeriod().getEndDateTime())
+                    .endDate(announcement.getEndDate().getValue())
                     .status(announcement.getStatus().toString())
                     .closedReason(getClosedReason(announcement))
                     .createdAt(announcement.getCreatedAt())

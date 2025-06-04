@@ -48,11 +48,12 @@ dependencies {
     // blaze persistence
     implementation "com.blazebit:blaze-persistence-core-api-jakarta:$blazePersistenceVersion"
     runtimeOnly "com.blazebit:blaze-persistence-core-impl-jakarta:$blazePersistenceVersion"
+    implementation "com.blazebit:blaze-persistence-integration-hibernate-6.2:$blazePersistenceVersion"
     implementation "com.blazebit:blaze-persistence-entity-view-api-jakarta:$blazePersistenceVersion"
     implementation "com.blazebit:blaze-persistence-entity-view-impl-jakarta:$blazePersistenceVersion"
-    implementation "com.blazebit:blaze-persistence-integration-hibernate-6.2:$blazePersistenceVersion"
     implementation "com.blazebit:blaze-persistence-integration-spring-data-3.3:$blazePersistenceVersion"
-    implementation "com.blazebit:blaze-persistence-integration-spring-data-webmvc-jakarta:$blazePersistenceVersion"
+
+    implementation "org.reflections:reflections:0.10.2"
 
     // openapi ui
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'

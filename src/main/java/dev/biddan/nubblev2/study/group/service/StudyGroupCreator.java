@@ -29,8 +29,6 @@ public class StudyGroupCreator {
                 .name(command.name())
                 .description(command.description())
                 .capacity(command.capacity())
-                .startDate(command.startDate())
-                .endDate(command.endDate())
                 .languages(parseLanguages(command.languages()))
                 .mainLanguage(parseMainLanguage(command.mainLanguage()))
                 .difficultyLevels(parseDifficultyLevels(command.difficultyLevels()))

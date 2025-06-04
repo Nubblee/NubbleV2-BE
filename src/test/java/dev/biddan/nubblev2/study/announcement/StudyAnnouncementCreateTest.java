@@ -20,7 +20,6 @@ import dev.biddan.nubblev2.user.controller.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,7 +31,6 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
     private String ownerAuthSessionId;
     private String otherUserAuthSessionId;
     private Long studyGroupId;
-    private LocalDate studyGroupEndDate;
 
     @BeforeEach
     void setUp() {
@@ -53,7 +51,6 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
         StudyGroupApiRequest.Create createRequest = StudyGroupRequestFixture.generateValidCreateRequest();
         Response createResponse = StudyGroupApiTestClient.create(createRequest, ownerAuthSessionId);
         studyGroupId = createResponse.jsonPath().getLong("studyGroup.id");
-        studyGroupEndDate = LocalDate.parse(createResponse.jsonPath().getString("studyGroup.endDate"));
 
         // given: 다른 사용자 회원가입 및 로그인
         UserApiRequest.Register otherRegisterRequest = UserRequestFixture.generateValidUserRegisterRequest();
@@ -78,8 +75,8 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
         @DisplayName("유효한 정보로 스터디 공고를 생성할 수 있다")
         void createAnnouncementWithValidData() {
             // given: 유효한 스터디 공고 생성 요청
-            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture
-                    .generateValidCreateRequest(studyGroupId, studyGroupEndDate);
+            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture.generateValidCreateRequest(
+                    studyGroupId);
 
             // when: 스터디 공고 생성
             Response response = StudyAnnouncementApiTestClient.create(request, ownerAuthSessionId);
@@ -112,8 +109,8 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
         @DisplayName("스터디장이 아닌 사용자가 공고를 생성하려고 하면 403을 반환한다")
         void createAnnouncementByNonOwnerShouldReturn403() {
             // given: 공고 생성 요청
-            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture
-                    .generateValidCreateRequest(studyGroupId, studyGroupEndDate);
+            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture.generateValidCreateRequest(
+                    studyGroupId);
 
             // when & then: 다른 사용자가 공고 생성 시도
             StudyAnnouncementApiTestClient.create(request, otherUserAuthSessionId)
@@ -126,8 +123,8 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
         @DisplayName("인증되지 않은 사용자가 공고를 생성하려고 하면 401을 반환한다")
         void createAnnouncementWithoutAuthShouldReturn401() {
             // given: 공고 생성 요청
-            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture
-                    .generateValidCreateRequest(studyGroupId, studyGroupEndDate);
+            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture.generateValidCreateRequest(
+                    studyGroupId);
 
             // when & then: 인증 없이 공고 생성 시도
             StudyAnnouncementApiTestClient.create(request, null)
@@ -145,8 +142,8 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
         void createAnnouncementWithNonExistentStudyGroupShouldReturn404() {
             // given: 존재하지 않는 스터디 그룹 ID
             Long nonExistentStudyGroupId = 99999L;
-            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture
-                    .generateValidCreateRequest(nonExistentStudyGroupId, studyGroupEndDate);
+            StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture.generateValidCreateRequest(
+                    nonExistentStudyGroupId);
 
             // when & then: 존재하지 않는 스터디 그룹으로 공고 생성 시도
             StudyAnnouncementApiTestClient.create(request, ownerAuthSessionId)
@@ -159,13 +156,13 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
         @DisplayName("이미 모집중인 공고가 있는 스터디 그룹에 추가 공고를 생성하려고 하면 409를 반환한다")
         void createDuplicateActiveAnnouncementShouldReturn409() {
             // given: 첫 번째 공고 등록
-            StudyAnnouncementApiRequest.Create firstRequest = StudyAnnouncementRequestFixture
-                    .generateValidCreateRequest(studyGroupId, studyGroupEndDate);
+            StudyAnnouncementApiRequest.Create firstRequest = StudyAnnouncementRequestFixture.generateValidCreateRequest(
+                    studyGroupId);
             StudyAnnouncementApiTestClient.create(firstRequest, ownerAuthSessionId);
 
             // given: 두 번째 공고 생성
-            StudyAnnouncementApiRequest.Create secondRequest = StudyAnnouncementRequestFixture
-                    .generateValidCreateRequest(studyGroupId, studyGroupEndDate);
+            StudyAnnouncementApiRequest.Create secondRequest = StudyAnnouncementRequestFixture.generateValidCreateRequest(
+                    studyGroupId);
 
             // when & then: 중복 공고 생성 시도
             StudyAnnouncementApiTestClient.create(secondRequest, ownerAuthSessionId)
@@ -196,8 +193,7 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
                     .title("정원 초과 테스트 공고")
                     .description("남은 정원보다 많은 인원을 모집하는 공고")
                     .recruitCapacity(15) // 스터디 그룹 정원(10명)보다도 많음
-                    .startDateTime(LocalDateTime.now())
-                    .endDateTime(studyGroupEndDate.atTime(20, 0))
+                    .endDate(LocalDate.now().plusDays(1))
                     .applicationFormContent("자유 기입: ")
                     .build();
 

@@ -44,9 +44,6 @@ public class StudyGroup {
     private StudyGroupCapacity capacity;
 
     @Embedded
-    private StudyGroupPeriod period;
-
-    @Embedded
     private StudyGroupLanguages languages;
 
     @Embedded
@@ -59,7 +56,7 @@ public class StudyGroup {
     private StudyGroupMeeting meeting;
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false,  updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -67,7 +64,7 @@ public class StudyGroup {
     private User creator;
 
     @Builder
-    public StudyGroup(String name, String description, Integer capacity, LocalDate startDate, LocalDate endDate,
+    public StudyGroup(String name, String description, Integer capacity,
             List<ProgrammingLanguage> languages, ProgrammingLanguage mainLanguage,
             List<DifficultyLevel> difficultyLevels, List<ProblemPlatform> problemPlatforms,
             MeetingType meetingType, String meetingRegion, List<MeetingDay> mainMeetingDays,
@@ -79,15 +76,14 @@ public class StudyGroup {
         this.name = new StudyGroupName(name);
         this.description = new StudyGroupDescription(description);
         this.capacity = new StudyGroupCapacity(capacity);
-        this.period = new StudyGroupPeriod(startDate, endDate);
         this.languages = new StudyGroupLanguages(languages, mainLanguage);
         this.difficultyLevels = new StudyGroupDifficultyLevels(difficultyLevels);
         this.problemPlatforms = new StudyGroupProblemPlatforms(problemPlatforms);
         this.meeting = new StudyGroupMeeting(meetingType, meetingRegion, mainMeetingDays);
     }
 
-    public boolean isCreator(Long creatorId) {
-        return this.creator.getId().equals(creatorId);
+    public boolean isNotCreator(Long creatorId) {
+        return !this.creator.getId().equals(creatorId);
     }
 
     public static StudyGroupUpdateBuilder updateBuilder() {
@@ -108,10 +104,6 @@ public class StudyGroup {
 
     void updateCapacity(StudyGroupCapacity capacity) {
         this.capacity = capacity;
-    }
-
-    void updatePeriod(StudyGroupPeriod period) {
-        this.period = period;
     }
 
     void updateLanguages(StudyGroupLanguages languages) {

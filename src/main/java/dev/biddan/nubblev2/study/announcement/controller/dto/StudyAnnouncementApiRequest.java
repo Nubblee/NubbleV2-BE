@@ -1,8 +1,7 @@
 package dev.biddan.nubblev2.study.announcement.controller.dto;
 
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 import lombok.Builder;
 
 public class StudyAnnouncementApiRequest {
@@ -13,8 +12,7 @@ public class StudyAnnouncementApiRequest {
             String title,
             String description,
             Integer recruitCapacity,
-            LocalDateTime startDateTime,
-            LocalDateTime endDateTime,
+            LocalDate endDate,
             String applicationFormContent
     ) {
 
@@ -23,8 +21,7 @@ public class StudyAnnouncementApiRequest {
                     .title(title)
                     .description(description)
                     .recruitCapacity(recruitCapacity)
-                    .startDateTime(startDateTime)
-                    .endDateTime(endDateTime)
+                    .endDate(endDate)
                     .applicationFormContent(applicationFormContent)
                     .build();
         }

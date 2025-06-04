@@ -20,9 +20,8 @@ public class StudyAnnouncementCreator {
                 .studyGroup(studyGroup)
                 .title(createCommand.title())
                 .description(createCommand.description())
+                .endDate(createCommand.endDate())
                 .recruitCapacity(createCommand.recruitCapacity())
-                .startDateTime(createCommand.startDateTime())
-                .endDateTime(createCommand.endDateTime())
                 .applicationFormContent(createCommand.applicationFormContent())
                 .build();
 

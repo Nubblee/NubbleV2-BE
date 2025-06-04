@@ -2,6 +2,7 @@ package dev.biddan.nubblev2.study.announcement.controller.dto;
 
 import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementView;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -44,7 +45,7 @@ public class StudyAnnouncementApiResponse {
             String description,
             Integer recruitCapacity,
             LocalDateTime startDateTime,
-            LocalDateTime endDateTime,
+            LocalDate endDate,
             String status,
             String closedReason,
             LocalDateTime createdAt,
@@ -59,8 +60,7 @@ public class StudyAnnouncementApiResponse {
                     .title(announcement.title())
                     .description(announcement.description())
                     .recruitCapacity(announcement.recruitCapacity())
-                    .startDateTime(announcement.startDateTime())
-                    .endDateTime(announcement.endDateTime())
+                    .endDate(announcement.endDate())
                     .status(announcement.status() != null ? announcement.status().toString() : null)
                     .closedReason(announcement.closedReason() != null ? announcement.closedReason().toString() : null)
                     .createdAt(announcement.createdAt())

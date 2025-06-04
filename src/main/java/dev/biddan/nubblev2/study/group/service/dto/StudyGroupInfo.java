@@ -14,8 +14,6 @@ public class StudyGroupInfo {
             String name,
             String description,
             Integer capacity,
-            LocalDate startDate,
-            LocalDate endDate,
             List<String> languages,
             String mainLanguage,
             List<String> difficultyLevels,
@@ -32,8 +30,6 @@ public class StudyGroupInfo {
                     .name(studyGroup.getName().getValue())
                     .description(studyGroup.getDescription().getValue())
                     .capacity(studyGroup.getCapacity().getValue())
-                    .startDate(studyGroup.getPeriod().getStartDate())
-                    .endDate(studyGroup.getPeriod().getEndDate())
                     .languages(studyGroup.getLanguages().getLanguages().stream()
                             .map(Enum::name)
                             .toList())

@@ -17,7 +17,6 @@ import dev.biddan.nubblev2.user.controller.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -138,7 +137,7 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
             // todo: 1개의 공고를 마감시켜야 함
 
             // when: RECRUITING 상태만 필터링 조회
-            Response response = StudyAnnouncementApiTestClient.findList(List.of("RECRUITING"),  null, null);
+            Response response = StudyAnnouncementApiTestClient.findList(List.of("RECRUITING"), null, null);
 
             // then: RECRUITING 상태의 공고만 조회됨
             response.then()
@@ -314,8 +313,8 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
     }
 
     private Long createAnnouncement(Long studyGroupId) {
-        StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture
-                .generateValidCreateRequest(studyGroupId, LocalDate.now().plusDays(1));
+        StudyAnnouncementApiRequest.Create request = StudyAnnouncementRequestFixture.generateValidCreateRequest(
+                studyGroupId);
         Response response = StudyAnnouncementApiTestClient.create(request, ownerAuthSessionId);
         return response.jsonPath().getLong("studyAnnouncement.id");
     }

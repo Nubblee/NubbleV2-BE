@@ -45,7 +45,7 @@ public class StudyGroupApiController {
             @CurrentUserId Long currentId,
             @PathVariable Long studyGroupId
     ) {
-        StudyGroupInfo.Private info = studyGroupService.update(studyGroupId, currentId, request.toUpdateCommand());
+        StudyGroupInfo.Private info = studyGroupService.update(studyGroupId, currentId, request.toCreateCommand());
 
         StudyGroupApiResponse.Private response = new StudyGroupApiResponse.Private(info);
 

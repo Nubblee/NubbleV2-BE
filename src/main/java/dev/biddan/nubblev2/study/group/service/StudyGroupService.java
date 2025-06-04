@@ -5,7 +5,6 @@ import dev.biddan.nubblev2.exception.http.NotFoundException;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand.Create;
-import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand.Update;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.repository.UserRepository;
@@ -32,11 +31,11 @@ public class StudyGroupService {
     }
 
     @Transactional
-    public StudyGroupInfo.Private update(Long studyGroupId, Long creatorId, Update updateCommand) {
+    public StudyGroupInfo.Private update(Long studyGroupId, Long creatorId, Create updateCommand) {
         StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 스터디 그룹입니다"));
 
-        if (!studyGroup.isCreator(creatorId)) {
+        if (studyGroup.isNotCreator(creatorId)) {
             throw new ForbiddenException("스터디 그룹을 수정할 권한이 없습니다");
         }
 

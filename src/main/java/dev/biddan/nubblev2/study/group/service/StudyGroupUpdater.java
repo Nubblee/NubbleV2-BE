@@ -19,16 +19,15 @@ import org.springframework.stereotype.Component;
 public class StudyGroupUpdater {
 
     @Transactional
-    public void update(StudyGroup studyGroup, StudyGroupCommand.Update command) {
+    public void update(StudyGroup studyGroup, StudyGroupCommand.Create command) {
         studyGroup.applyUpdate(buildUpdateCommand(command));
     }
 
-    private StudyGroupUpdateCommand buildUpdateCommand(StudyGroupCommand.Update command) {
+    private StudyGroupUpdateCommand buildUpdateCommand(StudyGroupCommand.Create command) {
         return StudyGroup.updateBuilder()
                 .name(command.name())
                 .description(command.description())
                 .capacity(command.capacity())
-                .period(command.startDate(), command.endDate())
                 .languages(parseLanguages(command.languages()), parseMainLanguage(command.mainLanguage()))
                 .difficultyLevels(parseDifficultyLevels(command.difficultyLevels()))
                 .problemPlatforms(parseProblemPlatforms(command.problemPlatforms()))

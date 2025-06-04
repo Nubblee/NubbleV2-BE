@@ -16,12 +16,6 @@ public class StudyGroupApiRequest {
 
             Integer capacity,
 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
-
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate,
-
             List<String> languages,
 
             String mainLanguage,
@@ -42,25 +36,6 @@ public class StudyGroupApiRequest {
                     .name(name)
                     .description(description)
                     .capacity(capacity)
-                    .startDate(startDate)
-                    .endDate(endDate)
-                    .languages(languages)
-                    .mainLanguage(mainLanguage)
-                    .difficultyLevels(difficultyLevels)
-                    .problemPlatforms(problemPlatforms)
-                    .meetingType(meetingType)
-                    .meetingRegion(meetingRegion)
-                    .mainMeetingDays(mainMeetingDays)
-                    .build();
-        }
-
-        public StudyGroupCommand.Update toUpdateCommand() {
-            return StudyGroupCommand.Update.builder()
-                    .name(name)
-                    .description(description)
-                    .capacity(capacity)
-                    .startDate(startDate)
-                    .endDate(endDate)
                     .languages(languages)
                     .mainLanguage(mainLanguage)
                     .difficultyLevels(difficultyLevels)

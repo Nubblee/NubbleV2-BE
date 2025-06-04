@@ -27,7 +27,7 @@ public class StudyAnnouncementService {
         StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 스터디 그룹입니다"));
 
-        if (!studyGroup.isCreator(currentUserId)) {
+        if (studyGroup.isNotCreator(currentUserId)) {
             throw new ForbiddenException("스터디 공고를 생성할 권한이 없습니다");
         }
 

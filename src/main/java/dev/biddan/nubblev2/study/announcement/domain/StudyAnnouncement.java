@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -47,7 +48,7 @@ public class StudyAnnouncement {
     private AnnouncementCapacity recruitCapacity;
 
     @Embedded
-    private AnnouncementPeriod period;
+    private AnnouncementEndDate endDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -68,15 +69,15 @@ public class StudyAnnouncement {
     private AnnouncementApplicationForm announcementApplicationForm;
 
     @Builder
-    public StudyAnnouncement(StudyGroup studyGroup, String title, String description,
-            Integer recruitCapacity, LocalDateTime startDateTime, LocalDateTime endDateTime, String applicationFormContent) {
+    public StudyAnnouncement(StudyGroup studyGroup, String title, String description, Integer recruitCapacity,
+            LocalDate endDate, String applicationFormContent) {
         Assert.notNull(studyGroup, "스터디 그룹은 필수입니다");
         this.studyGroup = studyGroup;
 
         this.title = new AnnouncementTitle(title);
         this.description = new AnnouncementDescription(description);
         this.recruitCapacity = new AnnouncementCapacity(recruitCapacity);
-        this.period = new AnnouncementPeriod(startDateTime, endDateTime, studyGroup);
+        this.endDate = new AnnouncementEndDate(endDate);
         this.status = AnnouncementStatus.RECRUITING;
         this.announcementApplicationForm = new AnnouncementApplicationForm(applicationFormContent);
     }
