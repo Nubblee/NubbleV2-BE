@@ -3,6 +3,7 @@ package dev.biddan.nubblev2.study.announcement.service;
 import dev.biddan.nubblev2.exception.http.ForbiddenException;
 import dev.biddan.nubblev2.exception.http.NotFoundException;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
+import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementRepository;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
@@ -18,6 +19,7 @@ public class StudyAnnouncementService {
     private final StudyAnnouncementCreator studyAnnouncementCreator;
     private final StudyGroupRepository studyGroupRepository;
     private final StudyAnnouncementDuplicateValidator duplicateValidator;
+    private final StudyAnnouncementRepository studyAnnouncementRepository;
 
     @Transactional
     public StudyAnnouncementInfo.Basic create(
@@ -34,6 +36,13 @@ public class StudyAnnouncementService {
         duplicateValidator.validateNoActiveAnnouncement(studyGroupId);
 
         StudyAnnouncement announcement = studyAnnouncementCreator.create(studyGroup, createCommand);
+
+        return StudyAnnouncementInfo.Basic.from(announcement);
+    }
+
+    public StudyAnnouncementInfo.Basic findById(Long announcementId) {
+        StudyAnnouncement announcement = studyAnnouncementRepository.findById(announcementId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 모집 공고입니다"));
 
         return StudyAnnouncementInfo.Basic.from(announcement);
     }
