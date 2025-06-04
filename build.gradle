@@ -54,6 +54,9 @@ dependencies {
     implementation "com.blazebit:blaze-persistence-integration-spring-data-3.3:$blazePersistenceVersion"
     implementation "com.blazebit:blaze-persistence-integration-spring-data-webmvc-jakarta:$blazePersistenceVersion"
 
+    // openapi ui
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
