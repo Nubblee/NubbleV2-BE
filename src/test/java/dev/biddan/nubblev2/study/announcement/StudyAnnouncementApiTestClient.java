@@ -45,4 +45,13 @@ public class StudyAnnouncementApiTestClient {
                 .log().ifError()
                 .extract().response();
     }
+
+    public static Response findById(Long announcementId) {
+        return given()
+                .when()
+                .get("/api/v1/study-announcements/{id}", announcementId)
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
 }
