@@ -15,18 +15,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.Assert;
 
 @Entity
-@Table(name = "study_application_forms")
+@Table(name = "study_application_forms",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_application_form_announcement_applicant",
+                        columnNames = {"announcement_id", "applicant_id"}
+                )
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@Getter
 public class StudyApplicationForm {
 
     @Id

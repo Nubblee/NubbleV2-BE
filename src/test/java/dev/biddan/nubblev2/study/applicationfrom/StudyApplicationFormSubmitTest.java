@@ -88,7 +88,7 @@ class StudyApplicationFormSubmitTest extends AbstractIntegrationTest {
                 .statusCode(201)
                 .body("applicationForm.id", notNullValue())
                 .body("applicationForm.announcementId", equalTo(announcementId.intValue()))
-                .body("applicationForm.applicantId", equalTo(applicantUserId.intValue()))
+                .body("applicationForm.applicant.id", equalTo(applicantUserId.intValue()))
                 .body("applicationForm.content", equalTo(request.content()))
                 .body("applicationForm.status", equalTo("SUBMITTED"))
                 .body("applicationForm.submittedAt", notNullValue());
@@ -126,7 +126,7 @@ class StudyApplicationFormSubmitTest extends AbstractIntegrationTest {
         ApplicationFormApiTestClient.submit(announcementId, secondRequest, applicantAuthSessionId)
                 .then()
                 .statusCode(409)
-                .body("detail", containsString("이미 지원하신 공고입니다"));
+                .body("detail", containsString("이미 지원한 공고입니다"));
     }
 
     @Test
