@@ -49,7 +49,18 @@ public class StudyAnnouncementApiTestClient {
     public static Response findById(Long announcementId) {
         return given()
                 .when()
-                .get("/api/v1/study-announcements/{id}", announcementId)
+                .post("/api/v1/study-announcements/{id}", announcementId)
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
+
+    public static Response close(Long announcementId, String ownerAuthSessionId) {
+        return given()
+                .cookie(AUTH_SESSION_COOKIE_NAME, ownerAuthSessionId)
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/study-announcements/{announcementId}/close}", announcementId)
                 .then()
                 .log().ifError()
                 .extract().response();
