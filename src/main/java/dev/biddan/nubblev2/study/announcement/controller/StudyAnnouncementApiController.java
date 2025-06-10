@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,6 +65,18 @@ public class StudyAnnouncementApiController {
     public ResponseEntity<StudyAnnouncementApiResponse.Basic> findById(@PathVariable Long announcementId) {
         Basic info = studyAnnouncementService.findById(announcementId);
 
-        return ResponseEntity.ok(new  StudyAnnouncementApiResponse.Basic(info));
+        return ResponseEntity.ok(new StudyAnnouncementApiResponse.Basic(info));
+    }
+
+    @AuthRequired
+    @PostMapping(path = "/{announcementId}/close")
+    public ResponseEntity<StudyAnnouncementApiResponse.Basic> close(
+            @PathVariable Long announcementId,
+            @CurrentUserId Long currentUserId
+    ) {
+        StudyAnnouncementInfo.Basic info = studyAnnouncementService.close(announcementId, currentUserId);
+
+        StudyAnnouncementApiResponse.Basic response = new StudyAnnouncementApiResponse.Basic(info);
+        return ResponseEntity.ok(response);
     }
 }

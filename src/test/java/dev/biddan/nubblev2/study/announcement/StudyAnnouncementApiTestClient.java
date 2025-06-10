@@ -60,7 +60,7 @@ public class StudyAnnouncementApiTestClient {
                 .cookie(AUTH_SESSION_COOKIE_NAME, ownerAuthSessionId)
                 .contentType(ContentType.JSON)
                 .when()
-                .post("/api/v1/study-announcements/{announcementId}/close}", announcementId)
+                .post("/api/v1/study-announcements/{announcementId}/close", announcementId)
                 .then()
                 .log().ifError()
                 .extract().response();

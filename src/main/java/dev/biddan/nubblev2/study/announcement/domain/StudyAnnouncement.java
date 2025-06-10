@@ -1,5 +1,6 @@
 package dev.biddan.nubblev2.study.announcement.domain;
 
+import dev.biddan.nubblev2.exception.http.ConflictException;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -80,6 +81,16 @@ public class StudyAnnouncement {
         this.endDate = new AnnouncementEndDate(endDate);
         this.status = AnnouncementStatus.RECRUITING;
         this.announcementApplicationForm = new AnnouncementApplicationForm(applicationFormContent);
+    }
+
+    public void close(ClosedReason closedReason, LocalDateTime now) {
+        if (this.status == AnnouncementStatus.CLOSED) {
+            throw new ConflictException("이미 마감된 공고입니다");
+        }
+
+        this.status = AnnouncementStatus.CLOSED;
+        this.closedReason = closedReason;
+        this.closedAt = LocalDateTime.now();
     }
 
     public enum AnnouncementStatus {

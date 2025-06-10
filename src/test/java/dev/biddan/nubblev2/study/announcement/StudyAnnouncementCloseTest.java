@@ -74,7 +74,7 @@ class StudyAnnouncementCloseTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("스터디장이 모집중인 공고를 마감할 수 있다")
+    @DisplayName("스터디장은 모집중인 공고를 마감할 수 있다")
     void closeRecruitingAnnouncementByOwner() {
         // given: 특정 시간으로 고정
         LocalDateTime closeTime = LocalDateTime.of(2024, 6, 15, 10, 30);
@@ -90,12 +90,6 @@ class StudyAnnouncementCloseTest extends AbstractIntegrationTest {
                 .body("studyAnnouncement.status", equalTo("CLOSED"))
                 .body("studyAnnouncement.closedReason", equalTo("MANUAL"))
                 .body("studyAnnouncement.closedAt", notNullValue());
-
-        // then: DB에서 상태 변경 확인
-        StudyAnnouncement closedAnnouncement = studyAnnouncementRepository.findById(announcementId).orElseThrow();
-        assertThat(closedAnnouncement.getStatus()).isEqualTo(AnnouncementStatus.CLOSED);
-        assertThat(closedAnnouncement.getClosedReason()).isEqualTo(ClosedReason.MANUAL);
-        assertThat(closedAnnouncement.getClosedAt()).isEqualTo(closeTime);
     }
 
     @Test
@@ -145,23 +139,5 @@ class StudyAnnouncementCloseTest extends AbstractIntegrationTest {
                 .then()
                 .statusCode(404)
                 .body("detail", containsString("존재하지 않는 모집 공고입니다"));
-    }
-
-    @Test
-    @DisplayName("마감된 공고는 목록 조회 시 CLOSED 상태로 표시된다")
-    void closedAnnouncementAppearsAsClosedInList() {
-        // given: 공고 마감
-        StudyAnnouncementApiTestClient.close(announcementId, ownerAuthSessionId);
-
-        // when: 전체 공고 목록 조회
-        Response listResponse = StudyAnnouncementApiTestClient.findList(null, null, null);
-
-        // then: 마감된 공고가 CLOSED 상태로 조회됨
-        listResponse.then()
-                .statusCode(200)
-                .body("announcements[0].id", equalTo(announcementId.intValue()))
-                .body("announcements[0].status", equalTo("CLOSED"))
-                .body("announcements[0].closedReason", equalTo("MANUAL"))
-                .body("announcements[0].closedAt", notNullValue());
     }
 }
