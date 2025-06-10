@@ -49,7 +49,7 @@ public class StudyAnnouncementApiTestClient {
     public static Response findById(Long announcementId) {
         return given()
                 .when()
-                .post("/api/v1/study-announcements/{id}", announcementId)
+                .get("/api/v1/study-announcements/{id}", announcementId)
                 .then()
                 .log().ifError()
                 .extract().response();
