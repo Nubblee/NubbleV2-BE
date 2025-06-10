@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import dev.biddan.nubblev2.AbstractIntegrationTest;
-import dev.biddan.nubblev2.user.controller.UserApiRequest;
+import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import dev.biddan.nubblev2.user.domain.User;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;

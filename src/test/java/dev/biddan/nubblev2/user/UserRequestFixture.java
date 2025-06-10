@@ -1,6 +1,6 @@
 package dev.biddan.nubblev2.user;
 
-import dev.biddan.nubblev2.user.controller.UserApiRequest;
+import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import java.util.UUID;
 
 public class UserRequestFixture {

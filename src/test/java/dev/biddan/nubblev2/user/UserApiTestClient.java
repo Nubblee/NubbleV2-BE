@@ -2,7 +2,7 @@ package dev.biddan.nubblev2.user;
 
 import static io.restassured.RestAssured.given;
 
-import dev.biddan.nubblev2.user.controller.UserApiRequest;
+import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 

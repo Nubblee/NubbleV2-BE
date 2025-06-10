@@ -1,7 +1,6 @@
 package dev.biddan.nubblev2.study.group;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
@@ -14,10 +13,9 @@ import dev.biddan.nubblev2.http.AuthSessionCookieManager;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
 import dev.biddan.nubblev2.user.UserApiTestClient;
 import dev.biddan.nubblev2.user.UserRequestFixture;
-import dev.biddan.nubblev2.user.controller.UserApiRequest;
+import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
-import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

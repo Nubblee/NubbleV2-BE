@@ -12,7 +12,7 @@ import dev.biddan.nubblev2.auth.controller.AuthApiRequest;
 import dev.biddan.nubblev2.auth.domain.LoginLog;
 import dev.biddan.nubblev2.http.AuthSessionCookieManager;
 import dev.biddan.nubblev2.user.UserApiTestClient;
-import dev.biddan.nubblev2.user.controller.UserApiRequest;
+import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import java.util.List;

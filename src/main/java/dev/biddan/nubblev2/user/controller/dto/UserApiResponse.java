@@ -1,4 +1,4 @@
-package dev.biddan.nubblev2.user.controller;
+package dev.biddan.nubblev2.user.controller.dto;
 
 import dev.biddan.nubblev2.user.service.dto.UserInfo;
 

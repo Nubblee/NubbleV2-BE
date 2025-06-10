@@ -15,12 +15,11 @@ import dev.biddan.nubblev2.study.group.StudyGroupRequestFixture;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
 import dev.biddan.nubblev2.user.UserApiTestClient;
 import dev.biddan.nubblev2.user.UserRequestFixture;
-import dev.biddan.nubblev2.user.controller.UserApiRequest;
+import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("스터디 공고 상세 조회 테스트")

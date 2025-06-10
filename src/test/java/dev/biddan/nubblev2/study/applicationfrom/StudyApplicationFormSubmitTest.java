@@ -18,7 +18,7 @@ import dev.biddan.nubblev2.study.group.StudyGroupRequestFixture;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
 import dev.biddan.nubblev2.user.UserApiTestClient;
 import dev.biddan.nubblev2.user.UserRequestFixture;
-import dev.biddan.nubblev2.user.controller.UserApiRequest;
+import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;

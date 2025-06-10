@@ -1,6 +1,5 @@
-package dev.biddan.nubblev2.user.controller;
+package dev.biddan.nubblev2.user.controller.dto;
 
-import dev.biddan.nubblev2.auth.service.AuthCommand;
 import dev.biddan.nubblev2.user.service.dto.UserCommand;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
