@@ -146,10 +146,8 @@ class StudyApplicationFormSubmitTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("[TODO] 마감된 공고에 지원하려고 하면 409을 반환한다")
     void cannotApplyToClosedAnnouncement() {
-        // TODO: 공고 마감 기능 구현 후 테스트 활성화
-        // 현재는 공고 상태 변경 기능이 없으므로 TODO로 표시
-
-        // TODO: given: 공고를 마감 상태로 변경
+        // given: 마감된 공고
+        StudyAnnouncementApiTestClient.close(announcementId, ownerAuthSessionId);
 
         // given: 신청서 요청 생성
         ApplicationFormApiRequest.Submit request = ApplicationFormRequestFixture.generateValidSubmitRequest();
@@ -158,7 +156,7 @@ class StudyApplicationFormSubmitTest extends AbstractIntegrationTest {
         // 현재는 구현되지 않았으므로 성공하지만, 향후 구현 시 400 에러 반환 예정
         ApplicationFormApiTestClient.submit(announcementId, request, applicantAuthSessionId)
                 .then()
-                .statusCode(201); // TODO: 구현 후 .statusCode(400)로 변경
-        // .body("detail", containsString("마감된 공고에는 지원할 수 없습니다"));
+                .statusCode(409)
+                .body("detail", containsString("마감된 공고에는 지원할 수 없습니다"));
     }
 }

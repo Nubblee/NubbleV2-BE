@@ -1,5 +1,6 @@
 package dev.biddan.nubblev2.study.announcement.service;
 
+import dev.biddan.nubblev2.exception.http.ConflictException;
 import dev.biddan.nubblev2.exception.http.ForbiddenException;
 import dev.biddan.nubblev2.exception.http.NotFoundException;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;

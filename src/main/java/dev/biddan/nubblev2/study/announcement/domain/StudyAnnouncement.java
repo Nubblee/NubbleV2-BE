@@ -83,14 +83,18 @@ public class StudyAnnouncement {
         this.announcementApplicationForm = new AnnouncementApplicationForm(applicationFormContent);
     }
 
-    public void close(ClosedReason closedReason, LocalDateTime now) {
+    public void close(ClosedReason closedReason, LocalDateTime closedDateTime) {
         if (this.status == AnnouncementStatus.CLOSED) {
             throw new ConflictException("이미 마감된 공고입니다");
         }
 
         this.status = AnnouncementStatus.CLOSED;
         this.closedReason = closedReason;
-        this.closedAt = LocalDateTime.now();
+        this.closedAt = closedDateTime;
+    }
+
+    public boolean isClosed() {
+        return this.status == AnnouncementStatus.CLOSED && this.closedAt != null;
     }
 
     public enum AnnouncementStatus {

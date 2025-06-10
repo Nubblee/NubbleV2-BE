@@ -1,6 +1,6 @@
 package dev.biddan.nubblev2.study.applicationform.controller.dto;
 
-import dev.biddan.nubblev2.study.applicationform.service.ApplicationFormService.ApplicationFormCommand;
+import dev.biddan.nubblev2.study.applicationform.service.dto.ApplicationFormCommand;
 
 public class ApplicationFormApiRequest {
 
