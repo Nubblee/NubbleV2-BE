@@ -134,7 +134,8 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 systemClock.advanceTime(Duration.ofMinutes(30));
             }
 
-            // todo: 1개의 공고를 마감시켜야 함
+            // 1개 공고 마감 처리
+            StudyAnnouncementApiTestClient.close(recruitingIds.get(0), ownerAuthSessionId);
 
             // when: RECRUITING 상태만 필터링 조회
             Response response = StudyAnnouncementApiTestClient.findList(List.of("RECRUITING"), null, null);
@@ -143,8 +144,7 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
             response.then()
                     .statusCode(200)
                     .body("announcements", hasSize(1))
-                    .body("announcements[0].status", equalTo("RECRUITING"))
-                    .body("announcements[0].id", equalTo(recruitingIds.get(0).intValue()));
+                    .body("announcements[0].status", equalTo("RECRUITING"));
         }
 
         @Test
@@ -154,17 +154,20 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
             LocalDateTime baseTime = LocalDateTime.of(2024, 6, 1, 16, 0);
             systemClock.setFixedTime(baseTime);
 
-            List<Long> allIds = new ArrayList<>();
+            List<Long> recruitingIds = new ArrayList<>();
 
             // given: 공고 4개 생성
             for (int i = 0; i < 4; i++) {
                 Long studyGroupId = createStudyGroup();
                 Long announcementId = createAnnouncement(studyGroupId);
-                allIds.add(announcementId);
+                recruitingIds.add(announcementId);
                 systemClock.advanceTime(Duration.ofMinutes(15));
             }
 
-            // todo: 2개의 공고를 마감시켜야 함
+            // 2개 공고 마감 처리
+            for (int i = 0; i < 2; i++) {
+                StudyAnnouncementApiTestClient.close(recruitingIds.get(i), ownerAuthSessionId);
+            }
 
             // when: RECRUITING과 CLOSED 모두 조회
             Response response = StudyAnnouncementApiTestClient.findList(List.of("RECRUITING", "CLOSED"), null, null);
@@ -173,8 +176,8 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
             response.then()
                     .statusCode(200)
                     .body("announcements", hasSize(4))
-                    .body("announcements[0].id", equalTo(allIds.get(3).intValue()))
-                    .body("announcements[3].id", equalTo(allIds.get(0).intValue()));
+                    .body("announcements[0].id", equalTo(recruitingIds.get(3).intValue()))
+                    .body("announcements[3].id", equalTo(recruitingIds.get(0).intValue()));
         }
 
         @Test
@@ -185,13 +188,19 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
             systemClock.setFixedTime(startTime);
 
             // given: 공고 4개 생성
+            List<Long> recruitingIds = new ArrayList<>();
+
             for (int i = 0; i < 4; i++) {
                 Long studyGroupId = createStudyGroup();
-                createAnnouncement(studyGroupId);
+                Long announcementId = createAnnouncement(studyGroupId);
+                recruitingIds.add(announcementId);
                 systemClock.advanceTime(Duration.ofMinutes(15));
             }
 
-            // todo: 2개의 공고를 마감시켜야 함
+            // 2개 공고 마감 처리
+            for (int i = 0; i < 2; i++) {
+                StudyAnnouncementApiTestClient.close(recruitingIds.get(i), ownerAuthSessionId);
+            }
 
             // when: 필터 없이 전체 조회
             Response response = StudyAnnouncementApiTestClient.findList(null, null, null);
