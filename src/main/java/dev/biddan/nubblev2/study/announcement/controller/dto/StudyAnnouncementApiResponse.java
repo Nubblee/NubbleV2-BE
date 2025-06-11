@@ -44,7 +44,6 @@ public class StudyAnnouncementApiResponse {
             String title,
             String description,
             Integer recruitCapacity,
-            LocalDateTime startDateTime,
             LocalDate endDate,
             String status,
             String closedReason,
