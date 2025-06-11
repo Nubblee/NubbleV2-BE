@@ -1,4 +1,4 @@
-package dev.biddan.nubblev2.study.applicationfrom;
+package dev.biddan.nubblev2.study.applicationform;
 
 import static dev.biddan.nubblev2.http.AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;

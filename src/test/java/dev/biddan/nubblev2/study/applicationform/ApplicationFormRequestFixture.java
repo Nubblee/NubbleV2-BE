@@ -1,4 +1,4 @@
-package dev.biddan.nubblev2.study.applicationfrom;
+package dev.biddan.nubblev2.study.applicationform;
 
 import dev.biddan.nubblev2.study.applicationform.controller.dto.ApplicationFormApiRequest;
 
