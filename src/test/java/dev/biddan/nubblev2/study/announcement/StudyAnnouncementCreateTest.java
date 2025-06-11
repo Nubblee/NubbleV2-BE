@@ -174,35 +174,27 @@ class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
             assertThat(studyAnnouncementRepository.count()).isEqualTo(1);
         }
 
-        // TODO: 향후 구현 예정 - 스터디 정원 관련 검증
         @Test
         @DisplayName("[TODO] 모집 인원이 스터디 그룹의 남은 정원보다 많으면 400을 반환한다")
         void createAnnouncementWithCapacityExceedingAvailableSlotsShouldReturn400() {
-            // given: 스터디 그룹 정원이 10명이고 현재 8명이 참여중이라면, 모집 인원은 최대 2명까지만 가능
-            // 현재는 StudyGroup에 현재 참여 인원 관리 기능이 없으므로 TODO로 표시
+            // given: 스터디 그룹 정원이 10명이고 리더 참여 상태
 
-            // TODO: StudyGroupMember 엔티티 구현 후 테스트 활성화
-            // given: 현재 스터디 그룹 정원 10명, 참여중 8명 상황 설정
-            // StudyGroupMember member1 = createStudyGroupMember(studyGroupId, user1);
-            // StudyGroupMember member2 = createStudyGroupMember(studyGroupId, user2);
-            // ... (총 8명 추가)
-
-            // given: 남은 정원(2명)보다 많은 모집 인원(5명) 요청
+            // given: 남은 정원(9명)보다 많은 모집 인원(10명) 요청
             StudyAnnouncementApiRequest.Create request = StudyAnnouncementApiRequest.Create.builder()
                     .studyGroupId(studyGroupId)
                     .title("정원 초과 테스트 공고")
                     .description("남은 정원보다 많은 인원을 모집하는 공고")
-                    .recruitCapacity(15) // 스터디 그룹 정원(10명)보다도 많음
+                    .recruitCapacity(10)
                     .endDate(LocalDate.now().plusDays(1))
                     .applicationFormContent("자유 기입: ")
                     .build();
 
-            // when & then: 정원 초과 모집으로 공고 생성 시도
-            // 현재는 구현되지 않았으므로 성공하지만, 향후 구현 시 400 에러 반환 예정
+            // when: 정원 초과 모집으로 공고 생성 시도
+            // then: 정원 초과로 422 응답
             StudyAnnouncementApiTestClient.create(request, ownerAuthSessionId)
                     .then()
-                    .statusCode(201); // TODO: 구현 후 .statusCode(400)으로 변경
-            // .body("detail", containsString("모집 인원이 스터디 그룹의 남은 정원을 초과합니다"));
+                    .statusCode(422)
+                    .body("detail", containsString("모집 인원이 남은 정원을 초과합니다."));
         }
     }
 

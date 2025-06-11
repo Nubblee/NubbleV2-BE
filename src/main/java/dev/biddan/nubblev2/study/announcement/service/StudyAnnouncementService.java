@@ -3,14 +3,18 @@ package dev.biddan.nubblev2.study.announcement.service;
 import static dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization.StudyGroupPermission.CLOSE_ANNOUNCEMENT;
 import static dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization.StudyGroupPermission.CREATE_ANNOUNCEMENT;
 
+import dev.biddan.nubblev2.exception.http.ConflictException;
 import dev.biddan.nubblev2.exception.http.ForbiddenException;
 import dev.biddan.nubblev2.exception.http.NotFoundException;
+import dev.biddan.nubblev2.exception.http.UnprocessableEntityException;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
+import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement.AnnouncementStatus;
 import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementRepository;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo.Basic;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
+import dev.biddan.nubblev2.study.group.domain.StudyGroupCapacity;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
 import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization;
@@ -26,11 +30,10 @@ public class StudyAnnouncementService {
 
     private final StudyAnnouncementCreator studyAnnouncementCreator;
     private final StudyGroupRepository studyGroupRepository;
-    private final StudyAnnouncementDuplicateValidator duplicateValidator;
     private final StudyAnnouncementRepository studyAnnouncementRepository;
     private final Clock clock;
-    private final StudyGroupMemberRepository studyGroupMemberRepository;
     private final StudyGroupAuthorization studyGroupAuthorization;
+    private final StudyGroupMemberRepository studyGroupMemberRepository;
 
     @Transactional
     public StudyAnnouncementInfo.Basic create(
@@ -44,7 +47,12 @@ public class StudyAnnouncementService {
             throw new ForbiddenException("스터디 공고를 생성할 권한이 없습니다");
         }
 
-        duplicateValidator.validateNoActiveAnnouncement(studyGroupId);
+        if (studyAnnouncementRepository.existsByStudyGroupIdAndStatus(
+                studyGroupId, AnnouncementStatus.RECRUITING)) {
+            throw new ConflictException("이미 모집중인 공고가 존재합니다");
+        }
+
+        validateCapacityLimit(studyGroup, createCommand.recruitCapacity());
 
         StudyAnnouncement announcement = studyAnnouncementCreator.create(studyGroup, createCommand);
 
@@ -56,6 +64,19 @@ public class StudyAnnouncementService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 모집 공고입니다"));
 
         return StudyAnnouncementInfo.Basic.from(announcement);
+    }
+
+    private void validateCapacityLimit(StudyGroup studyGroup, Integer recruitCapacity) {
+        Integer studyGroupCapacity = studyGroup.getCapacity().getValue();
+        long currentMemberCount = studyGroupMemberRepository.countByStudyGroupId(studyGroup.getId());
+        long totalMembersAfterRecruit = currentMemberCount + recruitCapacity;
+
+        if (totalMembersAfterRecruit > studyGroupCapacity) {
+            throw new UnprocessableEntityException(
+                    String.format("모집 인원이 남은 정원을 초과합니다. 모집 최대 %d명까지 모집할 수 있습니다",
+                            studyGroupCapacity - currentMemberCount)
+            );
+        }
     }
 
     @Transactional

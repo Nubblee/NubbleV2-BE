@@ -15,4 +15,11 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
               and m.role = :role
             """)
     boolean existsMember(Long studyGroupId, Long userId, MemberRole role);
+
+    @Query("""
+            select count(m)
+            from StudyGroupMember m
+            where m.studyGroup.id = :studyGroupId
+            """)
+    long countByStudyGroupId(Long studyGroupId);
 }
