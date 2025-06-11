@@ -20,8 +20,7 @@ public class StudyGroupInfo {
             List<String> problemPlatforms,
             String meetingType,
             String meetingRegion,
-            List<String> mainMeetingDays,
-            UserInfo.Public creator
+            List<String> mainMeetingDays
     ) {
 
         public static Private from(StudyGroup studyGroup) {
@@ -45,7 +44,6 @@ public class StudyGroupInfo {
                     .mainMeetingDays(studyGroup.getMeeting().getMainMeetingDays().stream()
                             .map(Enum::name)
                             .toList())
-                    .creator(UserInfo.Public.from(studyGroup.getCreator()))
                     .build();
         }
     }

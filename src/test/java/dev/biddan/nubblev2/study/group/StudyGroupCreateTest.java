@@ -67,9 +67,7 @@ class StudyGroupCreateTest extends AbstractIntegrationTest {
                 .body("studyGroup.problemPlatforms", hasItems(request.problemPlatforms().toArray()))
                 .body("studyGroup.meetingType", equalTo(request.meetingType()))
                 .body("studyGroup.meetingRegion", equalTo(request.meetingRegion()))
-                .body("studyGroup.mainMeetingDays", hasItems(request.mainMeetingDays().toArray()))
-                .body("studyGroup.creator.id", equalTo(userId.intValue()))
-                .body("studyGroup.creator.nickname", notNullValue());
+                .body("studyGroup.mainMeetingDays", hasItems(request.mainMeetingDays().toArray()));
 
         // then: DB에 저장 확인
         Long studyGroupId = response.jsonPath().getLong("studyGroup.id");

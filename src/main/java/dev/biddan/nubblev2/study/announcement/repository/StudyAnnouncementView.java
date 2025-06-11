@@ -38,13 +38,7 @@ public record StudyAnnouncementView(
         LocalDateTime closedAt,
 
         @Mapping("studyGroup.name.value")
-        String studyGroupName,
-
-        @Mapping("studyGroup.creator.id")
-        Long creatorId,
-
-        @Mapping("studyGroup.creator.nickname")
-        String creatorNickname
+        String studyGroupName
 ) {
 
 }

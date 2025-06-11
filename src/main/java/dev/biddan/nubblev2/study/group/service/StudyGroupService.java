@@ -6,6 +6,8 @@ import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand.Create;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo;
+import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization;
+import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization.StudyGroupPermission;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,7 @@ public class StudyGroupService {
     private final StudyGroupRepository studyGroupRepository;
     private final StudyGroupUpdater studyGroupUpdater;
     private final UserRepository userRepository;
+    private final StudyGroupAuthorization studyGroupAuthorization;
 
     public StudyGroupInfo.Private create(Long creatorId, Create createCommand) {
         User creator = userRepository.findById(creatorId)
@@ -31,11 +34,11 @@ public class StudyGroupService {
     }
 
     @Transactional
-    public StudyGroupInfo.Private update(Long studyGroupId, Long creatorId, Create updateCommand) {
+    public StudyGroupInfo.Private update(Long studyGroupId, Long userId, Create updateCommand) {
         StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 스터디 그룹입니다"));
 
-        if (studyGroup.isNotCreator(creatorId)) {
+        if (studyGroupAuthorization.lacksPermission(studyGroupId, userId, StudyGroupPermission.UPDATE_STUDY_GROUP)) {
             throw new ForbiddenException("스터디 그룹을 수정할 권한이 없습니다");
         }
 

@@ -12,7 +12,6 @@ public interface StudyAnnouncementRepository extends JpaRepository<StudyAnnounce
 
     @Query("SELECT a FROM StudyAnnouncement a "
             + "JOIN FETCH a.studyGroup g "
-            + "JOIN FETCH g.creator "
             + "WHERE a.id = :announcementId")
     Optional<StudyAnnouncement> findByIdWithStudyGroup(Long announcementId);
 }

@@ -9,8 +9,10 @@ import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProblemPlatform;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProgrammingLanguage;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand.Create;
+import dev.biddan.nubblev2.study.member.domain.StudyGroupMember;
+import dev.biddan.nubblev2.study.member.domain.StudyGroupMember.MemberRole;
+import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
 import dev.biddan.nubblev2.user.domain.User;
-import dev.biddan.nubblev2.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class StudyGroupCreator {
 
     private final StudyGroupRepository studyGroupRepository;
-    private final UserRepository userRepository;
+    private final StudyGroupMemberRepository studyGroupMemberRepository;
 
     @Transactional
     public StudyGroup create(User creator, Create command) {
@@ -36,10 +38,19 @@ public class StudyGroupCreator {
                 .meetingType(parseMeetingType(command.meetingType()))
                 .meetingRegion(command.meetingRegion())
                 .mainMeetingDays(parseMeetingDays(command.mainMeetingDays()))
-                .creator(creator)
                 .build();
 
-        return studyGroupRepository.save(newStudyGroup);
+        StudyGroup savedStudyGroup = studyGroupRepository.save(newStudyGroup);
+
+        StudyGroupMember leader = StudyGroupMember.builder()
+                .studyGroup(newStudyGroup)
+                .user(creator)
+                .role(MemberRole.LEADER)
+                .build();
+
+        studyGroupMemberRepository.save(leader);
+
+        return savedStudyGroup;
     }
 
     private List<ProgrammingLanguage> parseLanguages(List<String> languages) {

@@ -49,8 +49,7 @@ public class StudyAnnouncementApiResponse {
             String closedReason,
             LocalDateTime createdAt,
             LocalDateTime closedAt,
-            StudyGroupSummary studyGroup,
-            CreatorSummary creator
+            StudyGroupSummary studyGroup
     ) {
 
         public static Summary from(StudyAnnouncementView announcement) {
@@ -65,7 +64,6 @@ public class StudyAnnouncementApiResponse {
                     .createdAt(announcement.createdAt())
                     .closedAt(announcement.closedAt())
                     .studyGroup(new StudyGroupSummary(announcement.studyGroupId(), announcement.studyGroupName()))
-                    .creator(new CreatorSummary(announcement.creatorId(), announcement.creatorNickname()))
                     .build();
         }
     }
@@ -73,13 +71,6 @@ public class StudyAnnouncementApiResponse {
     public record StudyGroupSummary(
             Long id,
             String name
-    ) {
-
-    }
-
-    public record CreatorSummary(
-            Long id,
-            String nickname
     ) {
 
     }

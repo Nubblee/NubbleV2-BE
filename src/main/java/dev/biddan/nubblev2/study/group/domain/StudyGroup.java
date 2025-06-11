@@ -59,19 +59,11 @@ public class StudyGroup {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id", nullable = false)
-    private User creator;
-
     @Builder
     public StudyGroup(String name, String description, Integer capacity,
             List<ProgrammingLanguage> languages, ProgrammingLanguage mainLanguage,
             List<DifficultyLevel> difficultyLevels, List<ProblemPlatform> problemPlatforms,
-            MeetingType meetingType, String meetingRegion, List<MeetingDay> mainMeetingDays,
-            User creator) {
-
-        Assert.notNull(creator, "스터디 그룹 생성자는 필수입니다");
-        this.creator = creator;
+            MeetingType meetingType, String meetingRegion, List<MeetingDay> mainMeetingDays) {
 
         this.name = new StudyGroupName(name);
         this.description = new StudyGroupDescription(description);
@@ -80,10 +72,6 @@ public class StudyGroup {
         this.difficultyLevels = new StudyGroupDifficultyLevels(difficultyLevels);
         this.problemPlatforms = new StudyGroupProblemPlatforms(problemPlatforms);
         this.meeting = new StudyGroupMeeting(meetingType, meetingRegion, mainMeetingDays);
-    }
-
-    public boolean isNotCreator(Long creatorId) {
-        return !this.creator.getId().equals(creatorId);
     }
 
     public static StudyGroupUpdateBuilder updateBuilder() {
