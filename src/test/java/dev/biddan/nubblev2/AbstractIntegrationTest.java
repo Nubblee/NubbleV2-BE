@@ -1,13 +1,16 @@
 package dev.biddan.nubblev2;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.biddan.nubblev2.auth.repository.AuthSessionRepository;
 import dev.biddan.nubblev2.auth.repository.LoginLogRepository;
 import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementRepository;
-import dev.biddan.nubblev2.study.applicationform.domain.StudyApplicationForm;
 import dev.biddan.nubblev2.study.applicationform.repository.StudyApplicationFormRepository;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import io.restassured.RestAssured;
+import io.restassured.config.ObjectMapperConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,13 @@ public abstract class AbstractIntegrationTest {
 
     static {
         postgres.start();
+
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())               // Java 8 날짜/시간 지원
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // 배열 → ISO-8601
+
+        RestAssured.config = RestAssured.config().objectMapperConfig(
+                new ObjectMapperConfig().jackson2ObjectMapperFactory((cls, charset) -> mapper));
     }
 
     @DynamicPropertySource

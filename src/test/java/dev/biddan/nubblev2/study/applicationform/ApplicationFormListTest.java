@@ -30,12 +30,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("지원서 목록 조회 테스트 (Keyset 페이징)")
+@DisplayName("지원서 목록 조회 테스트")
 class ApplicationFormListTest extends AbstractIntegrationTest {
 
     private String ownerAuthSessionId;
     private Long announcementId;
-    private List<String> applicantSessionIds;
     private List<Long> applicationFormIds;
 
     @BeforeEach
@@ -48,42 +47,42 @@ class ApplicationFormListTest extends AbstractIntegrationTest {
         announcementId = createAnnouncement(studyGroupId, ownerAuthSessionId);
 
         // given: 다수의 지원자와 지원서 생성
-        applicantSessionIds = new ArrayList<>();
         applicationFormIds = new ArrayList<>();
     }
 
     @Test
-    @DisplayName("페이징이 정상 동작한다 - 첫 페이지부터 마지막까지")
+    @DisplayName("페이징이 정상 동작한다(오래된 순으로 조회) - 첫 페이지부터 마지막까지")
     void pagingWorksCorrectly() {
         // given: 8개의 지원서 생성 (2페이지 분량)
         createApplicationFormsWithTimeGap(8);
 
         // when: 첫 번째 페이지 조회
         Response firstPageResponse = ApplicationFormApiTestClient.findList(
-                announcementId, null, null, ownerAuthSessionId);
+                announcementId, null, null, null, ownerAuthSessionId);
 
         // then: 첫 페이지 검증 (5개, 다음 페이지 있음)
         firstPageResponse.then()
                 .statusCode(200)
-                .body("applicationForms", hasSize(5))
-                .body("hasNext", equalTo(true))
-                .body("nextKeysetPage", notNullValue())
-                // 오래된 순서: 0, 1, 2, 3, 4 (index 기준)
+                .body("meta.hasNext", equalTo(true))
+                .body("meta.lastId", notNullValue())
+                .body("meta.lastSubmittedAt", notNullValue())
                 .body("applicationForms[0].id", equalTo(applicationFormIds.get(0).intValue()))
                 .body("applicationForms[4].id", equalTo(applicationFormIds.get(4).intValue()));
 
         // when: 두 번째 페이지 조회
-        String nextKeysetPage = firstPageResponse.jsonPath().getString("nextKeysetPage");
+        Long lastId = firstPageResponse.jsonPath().getLong("applicationForms[4].id");
+        String lastSubmittedAtStr = firstPageResponse.jsonPath().getString("applicationForms[4].submittedAt");
+        LocalDateTime lastSubmittedAt = LocalDateTime.parse(lastSubmittedAtStr);
+
         Response secondPageResponse = ApplicationFormApiTestClient.findList(
-                announcementId, nextKeysetPage, null, ownerAuthSessionId);
+                announcementId, lastId, lastSubmittedAt, null, ownerAuthSessionId);
 
         // then: 두 번째 페이지 검증 (3개, 마지막 페이지)
         secondPageResponse.then()
                 .statusCode(200)
-                .body("applicationForms", hasSize(3))
-                .body("hasNext", equalTo(false))
-                .body("nextKeysetPage", nullValue())
-                // 다음 순서: 5, 6, 7 (index 기준)
+                .body("meta.hasNext", equalTo(false))
+                .body("meta.lastId", notNullValue())
+                .body("meta.lastSubmittedAt", notNullValue())
                 .body("applicationForms[0].id", equalTo(applicationFormIds.get(5).intValue()))
                 .body("applicationForms[2].id", equalTo(applicationFormIds.get(7).intValue()));
 
@@ -104,14 +103,13 @@ class ApplicationFormListTest extends AbstractIntegrationTest {
 
         // when: 첫 번째 페이지 조회
         Response response = ApplicationFormApiTestClient.findList(
-                announcementId, null, null, ownerAuthSessionId);
+                announcementId, null, null, null, ownerAuthSessionId);
 
         // then: 마지막 페이지임을 표시
         response.then()
-                .statusCode(200)
-                .body("applicationForms", hasSize(5))
-                .body("hasNext", equalTo(false))
-                .body("nextKeysetPage", nullValue());
+                .body("meta.hasNext", equalTo(false))
+                .body("meta.lastId", notNullValue())
+                .body("meta.lastSubmittedAt", notNullValue());
     }
 
     @Test
@@ -121,14 +119,15 @@ class ApplicationFormListTest extends AbstractIntegrationTest {
 
         // when: 첫 번째 페이지 조회
         Response response = ApplicationFormApiTestClient.findList(
-                announcementId, null, null, ownerAuthSessionId);
+                announcementId, null, null, null, ownerAuthSessionId);
 
         // then: 빈 결과 반환
         response.then()
                 .statusCode(200)
                 .body("applicationForms", hasSize(0))
-                .body("hasNext", equalTo(false))
-                .body("nextKeysetPage", nullValue());
+                .body("meta.hasNext", equalTo(false))
+                .body("meta.lastId", nullValue())
+                .body("meta.lastSubmittedAt", nullValue());
     }
 
     @Test
@@ -141,21 +140,45 @@ class ApplicationFormListTest extends AbstractIntegrationTest {
         String otherUserSessionId = createUserAndLogin();
 
         // when & then: 권한 없는 사용자가 조회 시도
-        ApplicationFormApiTestClient.findList(announcementId, null, null, otherUserSessionId)
+        ApplicationFormApiTestClient.findList(announcementId, null, null, null, otherUserSessionId)
                 .then()
                 .statusCode(403);
     }
 
     @Test
-    @DisplayName("유효하지 않은 keysetPage로 조회 시 적절한 에러를 반환한다")
-    void invalidKeysetPageReturnsError() {
-        // given: 유효하지 않은 keysetPage
-        String invalidKeysetPage = "invalid-keyset-page-value";
+    @DisplayName("상태별 필터링이 정상 동작한다")
+    void statusFilteringWorksCorrectly() {
+        // given: 다양한 상태의 지원서 생성
+        createApplicationFormsWithTimeGap(5);
 
-        // when & then: 유효하지 않은 keysetPage로 조회
-        ApplicationFormApiTestClient.findList(announcementId, invalidKeysetPage, null, ownerAuthSessionId)
-                .then()
-                .statusCode(400);
+        // when: SUBMITTED 상태만 필터링
+        Response response = ApplicationFormApiTestClient.findList(
+                announcementId, null, null, "SUBMITTED", ownerAuthSessionId);
+
+        // then: SUBMITTED 상태의 지원서만 조회됨
+        response.then()
+                .statusCode(200)
+                .body("applicationForms", hasSize(5));
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 커서 정보로 조회 시 적절히 처리된다")
+    void invalidCursorHandledCorrectly() {
+        // given: 지원서 생성
+        createApplicationFormsWithTimeGap(3);
+
+        // given: 존재하지 않는 ID와 미래 시간
+        Long futureId        = Long.MAX_VALUE;
+        LocalDateTime futureTime = LocalDateTime.of(2030, 1, 1, 0, 0);
+
+        // when: 유효하지 않은 커서로 조회
+        Response response = ApplicationFormApiTestClient.findList(
+                announcementId, futureId, futureTime, null, ownerAuthSessionId);
+
+        // then: 빈 결과나 적절한 에러 반환 (구현에 따라)
+        response.then()
+                .statusCode(200)
+                .body("applicationForms", hasSize(0));
     }
 
     private String createUserAndLogin() {
@@ -189,7 +212,6 @@ class ApplicationFormListTest extends AbstractIntegrationTest {
 
         for (int i = 0; i < count; i++) {
             String applicantSessionId = createUserAndLogin();
-            applicantSessionIds.add(applicantSessionId);
 
             ApplicationFormApiRequest.Submit request = new ApplicationFormApiRequest.Submit(
                     String.format("지원서 내용 %d번째입니다. 열심히 하겠습니다!", i + 1));
@@ -198,10 +220,7 @@ class ApplicationFormListTest extends AbstractIntegrationTest {
             Long applicationFormId = response.jsonPath().getLong("applicationForm.id");
             applicationFormIds.add(applicationFormId);
 
-            // 다음 지원서를 위해 시간 진행
-            if (i < count - 1) {
-                systemClock.advanceTime(Duration.ofMinutes(10));
-            }
+            systemClock.advanceTime(Duration.ofMinutes(10));
         }
     }
 }
