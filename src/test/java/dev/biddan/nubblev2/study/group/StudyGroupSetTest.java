@@ -21,7 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("스터디 그룹 생성 테스트")
-class StudyGroupCreateTest extends AbstractIntegrationTest {
+class StudyGroupSetTest extends AbstractIntegrationTest {
 
     private String authSessionId;
     private Long userId;

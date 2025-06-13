@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("스터디 공고 생성 테스트")
-class StudyAnnouncementCreateTest extends AbstractIntegrationTest {
+class StudyAnnouncementSetTest extends AbstractIntegrationTest {
 
     private String ownerAuthSessionId;
     private String otherUserAuthSessionId;

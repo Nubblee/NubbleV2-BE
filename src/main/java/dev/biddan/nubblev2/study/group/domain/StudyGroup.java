@@ -111,15 +111,15 @@ public class StudyGroup {
     }
 
     public enum ProgrammingLanguage {
-        JAVA, PYTHON, JAVASCRIPT, CPP, C, CSHARP, KOTLIN, SWIFT, GO, RUST
+        JAVA, PYTHON, JAVASCRIPT, CPP, C, CSHARP, KOTLIN, SWIFT, GO
     }
 
     public enum DifficultyLevel {
-        LV1, LV2, LV3, LV4, LV5, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND
+        LV1, LV2, LV3, LV4, LV5
     }
 
     public enum ProblemPlatform {
-        PROGRAMMERS, BAEKJOON, LEET_CODE, HACKER_RANK, CODE_TREE
+        PROGRAMMERS, BAEKJOON, LEET_CODE, CODE_TREE
     }
 
     public enum MeetingType {
