@@ -15,7 +15,7 @@ public class UserInterestApiTestClient {
                 .cookie(AUTH_SESSION_COOKIE_NAME, authSessionId)
                 .body(request)
                 .when()
-                .put("/api/v1/user/interests")
+                .put("/api/v1/user/interest")
                 .then()
                 .log().ifError()
                 .extract().response();

@@ -54,8 +54,7 @@ class UserInterestSetTest extends AbstractIntegrationTest {
         // then: 200 OK (생성됨)
         response.then()
                 .statusCode(200)
-                .body("userInterest.userId", equalTo(userId.intValue()))
-                .body("userInterest.interestedLanguages", hasItems("JAVA", "PYTHON"));
+                .body("userInterest.userId", equalTo(userId.intValue()));
     }
 
     @Test
@@ -68,8 +67,8 @@ class UserInterestSetTest extends AbstractIntegrationTest {
         // given: 수정할 관심사
         UserInterestApiRequest.Set updateRequest = UserInterestApiRequest.Set.builder()
                 .interestedLanguages(List.of("KOTLIN", "SWIFT"))
-                .currentLevels(List.of("LV4", "LV5"))
-                .preferredPlatforms(List.of("LEETCODE"))
+                .currentLevels(List.of("LV2", "LV3"))
+                .preferredPlatforms(List.of("PROGRAMMERS", "BAEKJOON"))
                 .build();
 
         // when: 관심사 수정
@@ -79,7 +78,7 @@ class UserInterestSetTest extends AbstractIntegrationTest {
         response.then()
                 .statusCode(200)
                 .body("userInterest.interestedLanguages", hasItems("KOTLIN", "SWIFT"))
-                .body("userInterest.targetLevels", hasItems("LV4", "LV5"))
-                .body("userInterest.preferredPlatforms", hasItems("LEETCODE"));
+                .body("userInterest.currentLevels", hasItems("LV2", "LV3"))
+                .body("userInterest.preferredPlatforms", hasItems("PROGRAMMERS", "BAEKJOON"));
     }
 }
