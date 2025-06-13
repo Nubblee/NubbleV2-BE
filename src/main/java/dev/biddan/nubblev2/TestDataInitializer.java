@@ -110,7 +110,7 @@ public class TestDataInitializer implements ApplicationRunner {
                         .name("백준 골드 달성 스터디")
                         .description("실버→골드 달성을 목표로 하는 스터디")
                         .capacity(6).languages(List.of("CPP","JAVA"))
-                        .mainLanguage("CPP").difficultyLevels(List.of("SILVER","GOLD"))
+                        .mainLanguage("CPP").difficultyLevels(List.of("LV3", "LV4"))
                         .problemPlatforms(List.of("BAEKJOON"))
                         .meetingType("OFFLINE").meetingRegion("서울시 서초구 서초동")
                         .mainMeetingDays(List.of("SUN")).build(),
