@@ -12,7 +12,7 @@ import org.springframework.util.Assert;
 @Getter
 public class AnnouncementDescription {
 
-    private static final int MAX_LENGTH = 2000;
+    private static final int MAX_LENGTH = 400;
 
     @Column(name = "description", nullable = false, length = MAX_LENGTH)
     private String value;

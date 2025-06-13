@@ -12,7 +12,7 @@ import org.springframework.util.Assert;
 @Getter
 public class ApplicationFormContent {
 
-    private static final int MAX_LENGTH = 5000;
+    private static final int MAX_LENGTH = 400;
 
     @Column(name = "content", nullable = false, length = MAX_LENGTH)
     private String value;
