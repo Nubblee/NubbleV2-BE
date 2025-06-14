@@ -48,4 +48,16 @@ public class ApplicationFormApiTestClient {
                 .log().ifError()
                 .extract().response();
     }
+
+    public static Response approve(Long announcementId, Long applicationFormId, String authSessionId) {
+        return given()
+                .cookie(AUTH_SESSION_COOKIE_NAME, authSessionId)
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/study-announcements/{announcementId}/application-forms/{applicationFormId}/approve",
+                        announcementId, applicationFormId)
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
 }
