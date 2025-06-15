@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.Assert;
 
@@ -22,15 +21,17 @@ import org.springframework.util.Assert;
 public class ApplicationFormReview {
 
     @Column(name = "reviewed_at")
-    @CreatedDate
     private LocalDateTime reviewedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewed_by")
-    private User reviewedBy;
+    @JoinColumn(name = "reviewer_id")
+    private User reviewer;
 
-    public ApplicationFormReview(User reviewer) {
-        Assert.notNull(reviewer, "검토자는 필수입니다");
-        this.reviewedBy = reviewer;
+    public ApplicationFormReview(User reviewerId, LocalDateTime reviewedAt) {
+        Assert.notNull(reviewerId, "검토자는 필수입니다");
+        Assert.notNull(reviewedAt, "검토 시간은 필수입니다");
+
+        this.reviewer = reviewerId;
+        this.reviewedAt = reviewedAt;
     }
 }

@@ -1,8 +1,10 @@
 package dev.biddan.nubblev2.study.applicationform.service.dto;
 
+import dev.biddan.nubblev2.study.applicationform.domain.ApplicationFormReview;
 import dev.biddan.nubblev2.study.applicationform.domain.StudyApplicationForm;
 import dev.biddan.nubblev2.study.applicationform.repository.ApplicationFormBlazeRepository.ApplicationFormPageResult;
 import dev.biddan.nubblev2.user.service.dto.UserInfo;
+import dev.biddan.nubblev2.user.service.dto.UserInfo.Public;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -16,18 +18,28 @@ public class ApplicationFormInfo {
             String status,
             LocalDateTime submittedAt,
             Long announcementId,
-            UserInfo.Public applicant
+            UserInfo.Public applicant,
+            Long reviewerId,
+            LocalDateTime reviewedAt
     ) {
 
-        public static Basic of(StudyApplicationForm savedForm) {
-            return Basic.builder()
-                    .id(savedForm.getId())
-                    .content(savedForm.getContent().getValue())
-                    .status(savedForm.getStatus().toString())
-                    .submittedAt(savedForm.getSubmittedAt())
-                    .announcementId(savedForm.getAnnouncement().getId())
-                    .applicant(UserInfo.Public.from(savedForm.getApplicant()))
-                    .build();
+        public static Basic of(StudyApplicationForm form) {
+            BasicBuilder builder = Basic.builder()
+                    .id(form.getId())
+                    .content(form.getContent().getValue())
+                    .status(form.getStatus().toString())
+                    .submittedAt(form.getSubmittedAt())
+                    .announcementId(form.getAnnouncement().getId())
+                    .applicant(Public.from(form.getApplicant()));
+
+            if (form.getReview() != null) {
+                ApplicationFormReview review = form.getReview();
+
+                builder.reviewerId(review.getReviewer().getId())
+                        .reviewedAt(review.getReviewedAt());
+            }
+
+            return builder.build();
         }
     }
 

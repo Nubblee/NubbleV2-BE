@@ -64,4 +64,18 @@ public class ApplicationFormApiController {
 
         return ResponseEntity.ok(response);
     }
+
+    @AuthRequired
+    @PostMapping(
+            path = "/{applicationFormId}/approve",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApplicationFormResponse.Basic> approve(
+            @PathVariable Long announcementId,
+            @PathVariable Long applicationFormId,
+            @CurrentUserId Long currentUserId
+    ) {
+        Basic info = applicationFormService.approve(announcementId, applicationFormId, currentUserId);
+
+        return ResponseEntity.ok(new ApplicationFormResponse.Basic(info));
+    }
 }

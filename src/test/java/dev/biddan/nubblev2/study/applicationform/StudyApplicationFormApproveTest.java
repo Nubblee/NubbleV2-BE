@@ -1,6 +1,7 @@
 package dev.biddan.nubblev2.study.applicationform;
 
 import static dev.biddan.nubblev2.http.AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME;
+import static dev.biddan.nubblev2.study.member.domain.StudyGroupMember.MemberRole.MEMBER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -36,6 +37,7 @@ class StudyApplicationFormApproveTest extends AbstractIntegrationTest {
     private String applicantAuthSessionId;
     private Long ownerUserId;
     private Long applicantUserId;
+    private Long studyGroupId;
     private Long announcementId;
     private Long applicationFormId;
 
@@ -58,15 +60,15 @@ class StudyApplicationFormApproveTest extends AbstractIntegrationTest {
         // given: 스터디 그룹 생성
         StudyGroupApiRequest.Create createRequest = StudyGroupRequestFixture.generateValidCreateRequest();
         Response createResponse = StudyGroupApiTestClient.create(createRequest, ownerAuthSessionId);
-        Long studyGroupId = createResponse.jsonPath().getLong("studyGroup.id");
+        studyGroupId = createResponse.jsonPath().getLong("studyGroup.id");
 
-        // given: 스터디 1명 모집 공고 생성
+        // given: 스터디 모집 공고 생성
         StudyAnnouncementApiRequest.Create announcementRequest = StudyAnnouncementApiRequest.Create.builder()
                 .studyGroupId(studyGroupId)
                 .title("Java 백엔드 개발자 스터디 모집")
                 .description("Spring Boot와 JPA를 활용한 백엔드 개발 스터디입니다. " +
                         "실무 프로젝트를 통해 함께 성장해요!")
-                .recruitCapacity(1)
+                .recruitCapacity(2)
                 .endDate(LocalDate.now().plusDays(1))
                 .applicationFormContent(
                         "알고리즘 학습 경험:\n지원 동기:\n사용 가능한 프로그래밍 언어:\n코딩테스트 풀이 경험:\n참여 가능 시간:\n주당 투자 가능 시간:\n")
@@ -108,13 +110,10 @@ class StudyApplicationFormApproveTest extends AbstractIntegrationTest {
                 .body("applicationForm.id", equalTo(applicationFormId.intValue()))
                 .body("applicationForm.status", equalTo("APPROVED"))
                 .body("applicationForm.reviewedAt", notNullValue())
-                .body("applicationForm.reviewedBy.id", equalTo(ownerUserId.intValue()));
+                .body("applicationForm.reviewerId", equalTo(ownerUserId.intValue()));
 
         // then: 지원자가 스터디 그룹 멤버로 추가됨
-        boolean isMember = studyGroupMemberRepository.existsMember(
-                announcementId, applicantUserId,
-                dev.biddan.nubblev2.study.member.domain.StudyGroupMember.MemberRole.MEMBER
-        );
+        boolean isMember = studyGroupMemberRepository.existsMember(studyGroupId, applicantUserId, MEMBER);
 
         assertThat(isMember).isTrue();
     }
@@ -122,36 +121,33 @@ class StudyApplicationFormApproveTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("정원이 모두 차면 공고가 자동으로 마감된다")
     void announcementClosesWhenCapacityReached() {
-        // when: 첫 번째 지원자 수락 (정원 충족)
+        // given: 추가 지원자 생성 및 로그인
+        Register additionalApplicantRegisterRequest = UserRequestFixture.generateValidUserRegisterRequest();
+        UserApiTestClient.register(additionalApplicantRegisterRequest);
+
+        AuthApiRequest.Login applicantLoginRequest = new AuthApiRequest.Login(
+                additionalApplicantRegisterRequest.loginId(),
+                additionalApplicantRegisterRequest.password()
+        );
+
+        Response additionalApplicantLoginResponse = AuthApiTestClient.login(applicantLoginRequest);
+        Cookie applicantSessionCookie = additionalApplicantLoginResponse.getDetailedCookie(AUTH_SESSION_COOKIE_NAME);
+        String additionalApplicantAuthSessionId = applicantSessionCookie.getValue();
+
+        // given: 추가 지원자 지원
+        ApplicationFormApiRequest.Submit submitRequest = ApplicationFormRequestFixture.generateValidSubmitRequest();
+        Response additionalSubmitResponse = ApplicationFormApiTestClient.submit(announcementId, submitRequest,
+                additionalApplicantAuthSessionId);
+        long additionalFormId = additionalSubmitResponse.jsonPath().getLong("applicationForm.id");
+
+        // when: 2명의 지원자 수락
         ApplicationFormApiTestClient.approve(announcementId, applicationFormId, ownerAuthSessionId);
+        ApplicationFormApiTestClient.approve(announcementId, additionalFormId, ownerAuthSessionId);
 
         // then: 공고가 자동 마감됨
         StudyAnnouncement announcement = studyAnnouncementRepository.findById(announcementId).orElseThrow();
         assertThat(announcement.getStatus()).isEqualTo(AnnouncementStatus.CLOSED);
         assertThat(announcement.getClosedReason()).isEqualTo(ClosedReason.AUTO_CAPACITY_REACHED);
-
-        // given: 두 번째 지원자 생성 및 로그인
-        Register secondApplicantRegisterRequest = UserRequestFixture.generateValidUserRegisterRequest();
-        UserApiTestClient.register(secondApplicantRegisterRequest);
-
-        AuthApiRequest.Login applicantLoginRequest = new AuthApiRequest.Login(
-                secondApplicantRegisterRequest.loginId(),
-                secondApplicantRegisterRequest.password()
-        );
-
-        Response secondApplicantLoginResponse = AuthApiTestClient.login(applicantLoginRequest);
-        Cookie applicantSessionCookie = secondApplicantLoginResponse.getDetailedCookie(AUTH_SESSION_COOKIE_NAME);
-        String secondApplicantAuthSessionId = applicantSessionCookie.getValue();
-
-        // when: 두번째 지원자 지원서 제출
-        ApplicationFormApiRequest.Submit submitRequest = ApplicationFormRequestFixture.generateValidSubmitRequest();
-        Response response = ApplicationFormApiTestClient.submit(
-                announcementId, submitRequest, secondApplicantAuthSessionId);
-
-        // then: 첫번쨰 지원자 수락으로 마감된 공고라 지원 불가
-        response.then()
-                .statusCode(409)
-                .body("detail", containsString("마감된 공고에는 지원할 수 없습니다"));
     }
 
     @Test
@@ -174,7 +170,7 @@ class StudyApplicationFormApproveTest extends AbstractIntegrationTest {
         ApplicationFormApiTestClient.approve(announcementId, applicationFormId, ownerAuthSessionId)
                 .then()
                 .statusCode(409)
-                .body("detail", containsString("이미 처리된 지원서입니다"));
+                .body("detail", containsString("제출된 상태일 때만 수락이 가능합니다"));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package dev.biddan.nubblev2.study.applicationform.domain;
 
+import dev.biddan.nubblev2.exception.http.ConflictException;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
 import dev.biddan.nubblev2.user.domain.User;
 import jakarta.persistence.Column;
@@ -78,6 +79,15 @@ public class StudyApplicationForm {
 
         this.content = new ApplicationFormContent(content);
         this.status = ApplicationFormStatus.SUBMITTED;
+    }
+
+    public void approve(User reviewer, LocalDateTime reviewedAt) {
+        if (status != ApplicationFormStatus.SUBMITTED) {
+            throw new ConflictException("제출된 상태일 때만 수락이 가능합니다");
+        }
+
+        this.status = ApplicationFormStatus.APPROVED;
+        this.review = new ApplicationFormReview(reviewer, reviewedAt);
     }
 
     public enum ApplicationFormStatus {

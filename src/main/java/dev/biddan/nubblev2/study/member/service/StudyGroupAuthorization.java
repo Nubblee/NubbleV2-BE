@@ -15,7 +15,11 @@ public class StudyGroupAuthorization {
     @Transactional(readOnly = true)
     public boolean lacksPermission(Long studyGroupId, Long userId, StudyGroupPermission permission) {
         return !switch (permission) {
-            case UPDATE_STUDY_GROUP, CREATE_ANNOUNCEMENT, CLOSE_ANNOUNCEMENT, VIEW_APPLICATION_FORMS ->
+            case UPDATE_STUDY_GROUP,
+                 CREATE_ANNOUNCEMENT,
+                 CLOSE_ANNOUNCEMENT,
+                 VIEW_APPLICATION_FORMS,
+                 APPROVE_APPLICATION_FORM->
                     studyGroupMemberRepository.existsMember(
                             studyGroupId, userId, MemberRole.LEADER);
         };
@@ -23,7 +27,7 @@ public class StudyGroupAuthorization {
 
     public enum StudyGroupPermission {
         UPDATE_STUDY_GROUP,
-        CLOSE_ANNOUNCEMENT, VIEW_APPLICATION_FORMS, CREATE_ANNOUNCEMENT
+        CLOSE_ANNOUNCEMENT, VIEW_APPLICATION_FORMS, APPROVE_APPLICATION_FORM, CREATE_ANNOUNCEMENT
     }
 
 }

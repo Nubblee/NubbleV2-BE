@@ -4,6 +4,7 @@ import dev.biddan.nubblev2.exception.http.ConflictException;
 import dev.biddan.nubblev2.exception.http.ForbiddenException;
 import dev.biddan.nubblev2.exception.http.NotFoundException;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
+import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement.ClosedReason;
 import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementRepository;
 import dev.biddan.nubblev2.study.applicationform.domain.StudyApplicationForm;
 import dev.biddan.nubblev2.study.applicationform.domain.StudyApplicationForm.ApplicationFormStatus;
@@ -12,10 +13,15 @@ import dev.biddan.nubblev2.study.applicationform.repository.ApplicationFormBlaze
 import dev.biddan.nubblev2.study.applicationform.repository.StudyApplicationFormRepository;
 import dev.biddan.nubblev2.study.applicationform.service.dto.ApplicationFormCommand.Submit;
 import dev.biddan.nubblev2.study.applicationform.service.dto.ApplicationFormInfo;
+import dev.biddan.nubblev2.study.group.domain.StudyGroup;
+import dev.biddan.nubblev2.study.member.domain.StudyGroupMember;
+import dev.biddan.nubblev2.study.member.domain.StudyGroupMember.MemberRole;
+import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
 import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization;
 import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization.StudyGroupPermission;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.repository.UserRepository;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +36,9 @@ public class ApplicationFormService {
     private final StudyApplicationFormRepository applicationFormRepository;
     private final StudyGroupAuthorization studyGroupAuthorization;
     private final ApplicationFormBlazeRepository applicationFormBlazeRepository;
+    private final StudyGroupMemberRepository studyGroupMemberRepository;
+    private final StudyApplicationFormRepository studyApplicationFormRepository;
+    private final Clock clock;
 
     @Transactional
     public ApplicationFormInfo.Basic submit(Long announcementId, Long applicantId,
@@ -77,5 +86,48 @@ public class ApplicationFormService {
                 announcementId, lastId, lastSubmittedAt, formStatus, pageSize);
 
         return ApplicationFormInfo.PageList.of(result);
+    }
+
+    @Transactional
+    public ApplicationFormInfo.Basic approve(Long announcementId, Long applicationFormId, Long reviewerId) {
+        StudyApplicationForm applicationForm = applicationFormRepository.findById(applicationFormId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 지원서입니다"));
+
+        User applicant = userRepository.findById(applicationForm.getApplicant().getId())
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 멤버입니다"));
+
+        StudyAnnouncement announcement = announcementRepository.findByIdWithStudyGroup(announcementId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 모집 공고입니다"));
+
+        User reviewer = userRepository.findById(reviewerId)
+                .orElseThrow(() -> new NotFoundException("리뷰어가 존재하지 않습니다"));
+
+        StudyGroup studyGroup = announcement.getStudyGroup();
+
+        if (studyGroupAuthorization.lacksPermission(studyGroup.getId(), reviewerId,
+                StudyGroupPermission.APPROVE_APPLICATION_FORM)) {
+            throw new ForbiddenException("지원서를 수락할 권한이 없습니다");
+        }
+
+        if (announcement.isClosed()) {
+            throw new ConflictException("마감된 공고의 지원서는 수락할 수 없습니다");
+        }
+
+        applicationForm.approve(reviewer,  LocalDateTime.now(clock));
+
+        StudyGroupMember newMember = StudyGroupMember.builder()
+                .studyGroup(studyGroup)
+                .user(applicant)
+                .role(MemberRole.MEMBER)
+                .build();
+
+        studyGroupMemberRepository.save(newMember);
+
+        if (studyApplicationFormRepository.countApprovedApplicationsByAnnouncementId(announcementId)
+                >= announcement.getRecruitCapacity().getValue()) {
+            announcement.close(ClosedReason.AUTO_CAPACITY_REACHED, LocalDateTime.now(clock));
+        }
+
+        return ApplicationFormInfo.Basic.of(applicationForm);
     }
 }
