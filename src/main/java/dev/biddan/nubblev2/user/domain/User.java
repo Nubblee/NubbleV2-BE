@@ -29,6 +29,7 @@ public class User {
     private static final int MAX_PASSWORD_LENGTH = 72;
     private static final int MAX_PREFERRED_AREA_LENGTH = 30;
     private static final int MAX_EMAIL_LENGTH = 254; // RFC 3696 기준
+    private static final int MAX_PROFILE_IMAGE_URL_LENGTH = 500;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,12 +50,15 @@ public class User {
     @Column(length = MAX_EMAIL_LENGTH)
     private String email;
 
+    @Column(name = "profile_image_url", length = MAX_PROFILE_IMAGE_URL_LENGTH)
+    private String profileImageUrl;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
     @Builder
-    public User(String loginId, String nickname, String password, String preferredArea, String email) {
+    public User(String loginId, String nickname, String password, String preferredArea, String email, String profileImageUrl) {
         Assert.hasText(loginId, "로그인 ID는 공백일 수 없습니다.");
         Assert.isTrue(MIN_LOGIN_ID_LENGTH <= loginId.length() && loginId.length() <= MAX_LOGIN_ID_LENGTH,
                 String.format("로그인 ID는 %d자 이상 %d자 이하여야 합니다.", MIN_LOGIN_ID_LENGTH, MAX_LOGIN_ID_LENGTH));
@@ -75,10 +79,16 @@ public class User {
                     String.format("이메일은 %d자까지 입력 가능합니디ㅏ.", MAX_EMAIL_LENGTH));
         }
 
+        if (profileImageUrl != null) {
+            Assert.isTrue(profileImageUrl.length() <= MAX_PROFILE_IMAGE_URL_LENGTH,
+                    String.format("프로필 이미지 URL은 %d자까지 입력 가능합니다.", MAX_PROFILE_IMAGE_URL_LENGTH));
+        }
+
         this.loginId = loginId;
         this.nickname = nickname;
         this.password = password;
         this.preferredArea = preferredArea;
         this.email = email;
+        this.profileImageUrl = profileImageUrl;
     }
 }

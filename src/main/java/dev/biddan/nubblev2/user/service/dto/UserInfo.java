@@ -13,6 +13,7 @@ public class UserInfo {
             String nickname,
             String preferredArea,
             String email,
+            String profileImageUrl,
             LocalDateTime createdAt
     ) {
 
@@ -23,6 +24,7 @@ public class UserInfo {
                     .nickname(user.getNickname())
                     .preferredArea(user.getPreferredArea())
                     .email(user.getEmail())
+                    .profileImageUrl(user.getProfileImageUrl())
                     .createdAt(user.getCreatedAt())
                     .build();
         }
@@ -31,12 +33,14 @@ public class UserInfo {
     @Builder
     public record Public(
             Long id,
-            String nickname
+            String nickname,
+            String profileImageUrl
     ) {
         public static Public from(User user) {
             return Public.builder()
                     .id(user.getId())
                     .nickname(user.getNickname())
+                    .profileImageUrl(user.getProfileImageUrl())
                     .build();
         }
     }
