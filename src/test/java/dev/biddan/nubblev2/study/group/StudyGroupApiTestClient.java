@@ -6,6 +6,7 @@ import static io.restassured.RestAssured.given;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 public class StudyGroupApiTestClient {
 
@@ -28,6 +29,21 @@ public class StudyGroupApiTestClient {
                 .body(request)
                 .when()
                 .patch("/api/v1/study-groups/{id}", studyGroupId)
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
+
+    public static Response getMyStudyGroups(String authSessionId) {
+        RequestSpecification requestSpec = given();
+
+        if (authSessionId != null) {
+            requestSpec.cookie(AUTH_SESSION_COOKIE_NAME, authSessionId);
+        }
+
+        return requestSpec
+                .when()
+                .get("/api/v1/user/study-groups")
                 .then()
                 .log().ifError()
                 .extract().response();
