@@ -90,8 +90,8 @@ public class UserInterest {
     private void validate(Long userId, List<ProgrammingLanguage> interestedLanguages,
             List<DifficultyLevel> targetLevels, List<ProblemPlatform> preferredPlatforms) {
         Assert.notNull(userId, "사용자 ID는 필수입니다");
-        Assert.notEmpty(interestedLanguages, "관심 언어는 최소 1개 이상 선택해야 합니다");
-        Assert.notEmpty(targetLevels, "현재 레벨은 최소 1개 이상 선택해야 합니다");
-        Assert.notEmpty(preferredPlatforms, "선호 플랫폼은 최소 1개 이상 선택해야 합니다");
+        Assert.notNull(interestedLanguages, "관심 언어 목록은 필수입니다");
+        Assert.notNull(targetLevels, "현재 레벨 목록은 필수입니다");
+        Assert.notNull(preferredPlatforms, "선호 플랫폼 목록은 필수입니다");
     }
 }

@@ -2,6 +2,7 @@ package dev.biddan.nubblev2.user.interest;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 
 import dev.biddan.nubblev2.AbstractIntegrationTest;
 import dev.biddan.nubblev2.auth.AuthApiTestClient;
@@ -80,5 +81,27 @@ class UserInterestSetTest extends AbstractIntegrationTest {
                 .body("userInterest.interestedLanguages", hasItems("KOTLIN", "SWIFT"))
                 .body("userInterest.currentLevels", hasItems("LV2", "LV3"))
                 .body("userInterest.preferredPlatforms", hasItems("PROGRAMMERS", "BAEKJOON"));
+    }
+
+    @Test
+    @DisplayName("빈 목록으로 관심사를 설정할 수 있다")
+    void setEmptyUserInterest() {
+        // given: 모든 항목이 빈 목록인 관심사 설정 요청
+        UserInterestApiRequest.Set request = UserInterestApiRequest.Set.builder()
+                .interestedLanguages(List.of())
+                .currentLevels(List.of())
+                .preferredPlatforms(List.of())
+                .build();
+
+        // when: 관심사 설정
+        Response response = UserInterestApiTestClient.set(request, authSessionId);
+
+        // then: 200 OK
+        response.then()
+                .statusCode(200)
+                .body("userInterest.userId", equalTo(userId.intValue()))
+                .body("userInterest.interestedLanguages", hasSize(0))
+                .body("userInterest.currentLevels", hasSize(0))
+                .body("userInterest.preferredPlatforms", hasSize(0));
     }
 }
