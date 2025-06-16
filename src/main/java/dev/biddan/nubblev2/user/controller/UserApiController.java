@@ -1,7 +1,11 @@
 package dev.biddan.nubblev2.user.controller;
 
 import dev.biddan.nubblev2.argument.userid.CurrentUserId;
+import dev.biddan.nubblev2.auth.service.AuthSessionCreator;
+import dev.biddan.nubblev2.auth.service.AuthSessionInfo;
 import dev.biddan.nubblev2.exception.http.BadRequestException;
+import dev.biddan.nubblev2.http.AuthSessionCookieManager;
+import dev.biddan.nubblev2.http.HttpIpExtractor;
 import dev.biddan.nubblev2.interceptor.auth.AuthRequired;
 import dev.biddan.nubblev2.user.controller.dto.AvailabilityApiResponse;
 import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
@@ -10,10 +14,13 @@ import dev.biddan.nubblev2.user.repository.UserRepository;
 import dev.biddan.nubblev2.user.service.UserService;
 import dev.biddan.nubblev2.user.service.dto.UserInfo;
 import dev.biddan.nubblev2.user.service.dto.UserInfo.Private;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,17 +34,30 @@ public class UserApiController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+    private final HttpIpExtractor httpIpExtractor;
+    private final AuthSessionCreator authSessionCreator;
+    private final AuthSessionCookieManager authSessionCookieManager;
 
     @PostMapping(
             path = "/api/v1/users",
             produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserApiResponse.Private> register(@RequestBody @Valid UserApiRequest.Register request) {
+    public ResponseEntity<UserApiResponse.Private> register(
+            @RequestBody @Valid UserApiRequest.Register request,
+            HttpServletRequest httpServletRequest) {
 
-        UserInfo.Private info = userService.register(request.toRegisterCommand());
+        UserInfo.Private userInfo = userService.register(request.toRegisterCommand());
 
-        UserApiResponse.Private response = new UserApiResponse.Private(info);
+        String clientIp = httpIpExtractor.getClientIpAddress(httpServletRequest);
+        String userAgent = httpServletRequest.getHeader("User-Agent");
+
+        AuthSessionInfo.Basic authSessionInfo = authSessionCreator.create(userInfo, clientIp, userAgent);
+
+        ResponseCookie sessionCookie = authSessionCookieManager.createSessionCookie(authSessionInfo.sessionId());
+
+        UserApiResponse.Private response = new UserApiResponse.Private(userInfo);
 
         return ResponseEntity.status(HttpStatus.CREATED)
+                .header(HttpHeaders.SET_COOKIE, sessionCookie.toString())
                 .body(response);
     }
 
