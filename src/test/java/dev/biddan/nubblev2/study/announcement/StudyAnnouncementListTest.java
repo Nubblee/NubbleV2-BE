@@ -8,6 +8,9 @@ import dev.biddan.nubblev2.auth.AuthApiTestClient;
 import dev.biddan.nubblev2.auth.controller.AuthApiRequest;
 import dev.biddan.nubblev2.http.AuthSessionCookieManager;
 import dev.biddan.nubblev2.study.announcement.controller.dto.StudyAnnouncementApiRequest;
+import dev.biddan.nubblev2.study.applicationform.ApplicationFormApiTestClient;
+import dev.biddan.nubblev2.study.applicationform.ApplicationFormRequestFixture;
+import dev.biddan.nubblev2.study.applicationform.controller.dto.ApplicationFormApiRequest;
 import dev.biddan.nubblev2.study.group.StudyGroupApiTestClient;
 import dev.biddan.nubblev2.study.group.StudyGroupRequestFixture;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
@@ -107,9 +110,9 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
             listResponse.then()
                     .statusCode(200)
                     .body("announcements", hasSize(3))
-                    .body("announcements[0].id", equalTo(announcementIds.get(0).intValue()))
+                    .body("announcements[2].id", equalTo(announcementIds.get(0).intValue()))
                     .body("announcements[1].id", equalTo(announcementIds.get(1).intValue()))
-                    .body("announcements[2].id", equalTo(announcementIds.get(2).intValue()));
+                    .body("announcements[0].id", equalTo(announcementIds.get(2).intValue()));
         }
 
     }
@@ -315,6 +318,30 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
 
     }
 
+    @Test
+    @DisplayName("지원자 수락 후 목록에서 acceptedCount가 정확히 반영된다")
+    void approvedCount_reflects_after_approval() {
+        // given: 공고 생성
+        Long studyGroup1Id = createStudyGroup();
+        Long announcement1Id = createAnnouncement(studyGroup1Id);
+
+        // given: 공고에 지원서 제출
+        Long form1Id = createApplicantAndSubmit(announcement1Id);
+
+        // given: 지원서 수락
+        ApplicationFormApiTestClient.approve(announcement1Id, form1Id, ownerAuthSessionId);
+
+        // when: 목록 조회
+        Response response = StudyAnnouncementApiTestClient.findList(null, null, null);
+
+        // then: 공고에 수락 인원이 정확히 반영됨
+        response.then()
+                .statusCode(200)
+                .body("announcements", hasSize(1))
+                .body("announcements[0].id", equalTo(announcement1Id.intValue()))
+                .body("announcements[0].meta.approvedCount", equalTo(1));
+    }
+
     private Long createStudyGroup() {
         StudyGroupApiRequest.Create createRequest = StudyGroupRequestFixture.generateValidCreateRequest();
         Response createResponse = StudyGroupApiTestClient.create(createRequest, ownerAuthSessionId);
@@ -326,5 +353,23 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 studyGroupId);
         Response response = StudyAnnouncementApiTestClient.create(request, ownerAuthSessionId);
         return response.jsonPath().getLong("studyAnnouncement.id");
+    }
+
+    private Long createApplicantAndSubmit(Long announcementId) {
+        // 지원자 생성 및 로그인
+        UserApiRequest.Register applicantRequest = UserRequestFixture.generateValidUserRegisterRequest();
+        UserApiTestClient.register(applicantRequest);
+
+        AuthApiRequest.Login applicantLogin = new AuthApiRequest.Login(
+                applicantRequest.loginId(), applicantRequest.password());
+        Response loginResponse = AuthApiTestClient.login(applicantLogin);
+        Cookie applicantCookie = loginResponse.getDetailedCookie(AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME);
+
+        // 지원서 제출
+        ApplicationFormApiRequest.Submit submitRequest = ApplicationFormRequestFixture.generateValidSubmitRequest();
+        Response submitResponse = ApplicationFormApiTestClient.submit(
+                announcementId, submitRequest, applicantCookie.getValue());
+
+        return submitResponse.jsonPath().getLong("applicationForm.id");
     }
 }

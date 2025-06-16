@@ -1,10 +1,14 @@
 package dev.biddan.nubblev2.study.announcement.controller.dto;
 
+import com.blazebit.persistence.PagedList;
 import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementView;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
+import dev.biddan.nubblev2.study.applicationform.domain.StudyApplicationForm;
+import dev.biddan.nubblev2.study.applicationform.service.dto.ApplicationFormInfo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 
 public class StudyAnnouncementApiResponse {
@@ -15,15 +19,25 @@ public class StudyAnnouncementApiResponse {
 
     }
 
-    public record PagedList(
+    public record WithMeta(
+            StudyAnnouncementInfo.WithMeta studyAnnouncement
+    ) {
+    }
+
+    public record Page(
             List<Summary> announcements,
             PageMeta meta
     ) {
 
 
-        public static PagedList from(com.blazebit.persistence.PagedList<StudyAnnouncementView> pagedResult) {
+        public static Page from(
+                PagedList<StudyAnnouncementView> pagedResult,
+                Map<Long, Long> approvedCountsMap) {
             List<Summary> summaries = pagedResult.stream()
-                    .map(Summary::from)
+                    .map(announcement -> Summary.from(
+                            announcement,
+                            approvedCountsMap.getOrDefault(announcement.id(), 0L).intValue()
+                    ))
                     .toList();
 
             PageMeta pageMeta = PageMeta.builder()
@@ -34,7 +48,7 @@ public class StudyAnnouncementApiResponse {
                     .hasPrevious(pagedResult.getPage() > 1)
                     .build();
 
-            return new PagedList(summaries, pageMeta);
+            return new Page(summaries, pageMeta);
         }
     }
 
@@ -49,10 +63,11 @@ public class StudyAnnouncementApiResponse {
             String closedReason,
             LocalDateTime createdAt,
             LocalDateTime closedAt,
-            StudyGroupSummary studyGroup
+            StudyGroupSummary studyGroup,
+            StudyAnnouncementInfo.Meta meta
     ) {
 
-        public static Summary from(StudyAnnouncementView announcement) {
+        public static Summary from(StudyAnnouncementView announcement, int approvedCount) {
             return Summary.builder()
                     .id(announcement.id())
                     .title(announcement.title())
@@ -64,6 +79,7 @@ public class StudyAnnouncementApiResponse {
                     .createdAt(announcement.createdAt())
                     .closedAt(announcement.closedAt())
                     .studyGroup(new StudyGroupSummary(announcement.studyGroupId(), announcement.studyGroupName()))
+                    .meta(new StudyAnnouncementInfo.Meta(approvedCount))
                     .build();
         }
     }

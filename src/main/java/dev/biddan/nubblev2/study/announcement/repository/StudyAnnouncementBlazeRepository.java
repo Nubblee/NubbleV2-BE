@@ -25,7 +25,7 @@ public class StudyAnnouncementBlazeRepository {
     public PagedList<StudyAnnouncementView> findAnnouncements(List<String> statuses, int page, int size) {
         CriteriaBuilder<StudyAnnouncement> baseQueryBuilder = cbf
                 .create(em, StudyAnnouncement.class)
-                .orderByDesc("createdAt").orderByAsc("id");
+                .orderByDesc("createdAt").orderByDesc("id");
 
         if (statuses != null && !statuses.isEmpty()) {
             List<AnnouncementStatus> announcementStatuses = statuses.stream()

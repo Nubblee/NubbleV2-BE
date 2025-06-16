@@ -50,4 +50,22 @@ public class StudyAnnouncementInfo {
         AnnouncementApplicationForm form = announcement.getAnnouncementApplicationForm();
         return form != null ? form.getContent() : null;
     }
+
+    public record Meta(
+            int approvedCount
+    ) {
+    }
+
+    public record WithMeta(
+            Basic announcement,
+            Meta meta
+    ) {
+
+        public static WithMeta of(StudyAnnouncement announcement, int approveCount) {
+            Basic basic = Basic.from(announcement);
+            Meta meta = new Meta(approveCount);
+
+            return new WithMeta(basic, meta);
+        }
+    }
 }

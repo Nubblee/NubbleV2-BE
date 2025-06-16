@@ -13,8 +13,8 @@ import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementReposi
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementCommand;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo.Basic;
+import dev.biddan.nubblev2.study.applicationform.repository.StudyApplicationFormRepository;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
-import dev.biddan.nubblev2.study.group.domain.StudyGroupCapacity;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
 import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization;
@@ -34,6 +34,7 @@ public class StudyAnnouncementService {
     private final Clock clock;
     private final StudyGroupAuthorization studyGroupAuthorization;
     private final StudyGroupMemberRepository studyGroupMemberRepository;
+    private final StudyApplicationFormRepository studyApplicationFormRepository;
 
     @Transactional
     public StudyAnnouncementInfo.Basic create(
@@ -59,11 +60,14 @@ public class StudyAnnouncementService {
         return StudyAnnouncementInfo.Basic.from(announcement);
     }
 
-    public StudyAnnouncementInfo.Basic findById(Long announcementId) {
+    public StudyAnnouncementInfo.WithMeta findById(Long announcementId) {
         StudyAnnouncement announcement = studyAnnouncementRepository.findById(announcementId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 모집 공고입니다"));
 
-        return StudyAnnouncementInfo.Basic.from(announcement);
+        int approvedCount = studyApplicationFormRepository.countApprovedApplicationsByAnnouncementId(announcementId)
+                .intValue();
+
+        return StudyAnnouncementInfo.WithMeta.of(announcement, approvedCount);
     }
 
     private void validateCapacityLimit(StudyGroup studyGroup, Integer recruitCapacity) {

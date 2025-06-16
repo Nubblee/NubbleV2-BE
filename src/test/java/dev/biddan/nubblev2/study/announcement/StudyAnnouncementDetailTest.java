@@ -65,17 +65,18 @@ class StudyAnnouncementDetailTest extends AbstractIntegrationTest {
         // then: 200 OK와 공고 상세 정보 반환
         response.then()
                 .statusCode(200)
-                .body("studyAnnouncement.id", equalTo(announcementId.intValue()))
-                .body("studyAnnouncement.studyGroupId", equalTo(studyGroupId.intValue()))
-                .body("studyAnnouncement.title", equalTo(originalRequest.title()))
-                .body("studyAnnouncement.description", equalTo(originalRequest.description()))
-                .body("studyAnnouncement.recruitCapacity", equalTo(originalRequest.recruitCapacity()))
-                .body("studyAnnouncement.endDate", equalTo(originalRequest.endDate().toString()))
-                .body("studyAnnouncement.status", equalTo("RECRUITING"))
-                .body("studyAnnouncement.closedReason", nullValue())
-                .body("studyAnnouncement.createdAt", notNullValue())
-                .body("studyAnnouncement.closedAt", nullValue())
-                .body("studyAnnouncement.applicationForm", equalTo(originalRequest.applicationFormContent()));
+                .body("studyAnnouncement.announcement.id", equalTo(announcementId.intValue()))
+                .body("studyAnnouncement.announcement.studyGroupId", equalTo(studyGroupId.intValue()))
+                .body("studyAnnouncement.announcement.title", equalTo(originalRequest.title()))
+                .body("studyAnnouncement.announcement.description", equalTo(originalRequest.description()))
+                .body("studyAnnouncement.announcement.recruitCapacity", equalTo(originalRequest.recruitCapacity()))
+                .body("studyAnnouncement.meta.approvedCount", equalTo(0))
+                .body("studyAnnouncement.announcement.endDate", equalTo(originalRequest.endDate().toString()))
+                .body("studyAnnouncement.announcement.status", equalTo("RECRUITING"))
+                .body("studyAnnouncement.announcement.closedReason", nullValue())
+                .body("studyAnnouncement.announcement.createdAt", notNullValue())
+                .body("studyAnnouncement.announcement.closedAt", nullValue())
+                .body("studyAnnouncement.announcement.applicationForm", equalTo(originalRequest.applicationFormContent()));
     }
 
     @Test
