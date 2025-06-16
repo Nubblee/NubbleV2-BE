@@ -12,6 +12,9 @@ import dev.biddan.nubblev2.study.announcement.service.StudyAnnouncementService;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo.WithMeta;
 import dev.biddan.nubblev2.study.applicationform.repository.StudyApplicationFormRepository;
+import dev.biddan.nubblev2.study.group.domain.StudyGroup.DifficultyLevel;
+import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProgrammingLanguage;
+import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,7 @@ public class StudyAnnouncementApiController {
     private final StudyAnnouncementService studyAnnouncementService;
     private final StudyAnnouncementBlazeRepository studyAnnouncementBlazeRepository;
     private final StudyApplicationFormRepository studyApplicationFormRepository;
+    private final StudyGroupRepository studyGroupRepository;
 
     @AuthRequired
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -66,9 +70,16 @@ public class StudyAnnouncementApiController {
                 .map(StudyAnnouncementView::id)
                 .toList();
 
+        List<Long> studyGroupIds = announcements.stream()
+                .map(announcement -> announcement.studyGroup().id())
+                .distinct()
+                .toList();
+
+        Map<Long, List<ProgrammingLanguage>> languagesMap = studyGroupRepository.getLanguagesMapByStudyGroupIds(studyGroupIds);
+        Map<Long, List<DifficultyLevel>> difficultyLevelsMap = studyGroupRepository.getDifficultyLevelsMapByStudyGroupIds(studyGroupIds);
         Map<Long, Long> approvedCountsMap = studyApplicationFormRepository.countApprovedApplicationsByAnnouncementIds(announcementIds);
 
-        return ResponseEntity.ok(Page.from(announcements, approvedCountsMap));
+        return ResponseEntity.ok(Page.from(announcements, languagesMap, difficultyLevelsMap, approvedCountsMap));
     }
 
     @GetMapping(path = "/{announcementId}", produces = MediaType.APPLICATION_JSON_VALUE)

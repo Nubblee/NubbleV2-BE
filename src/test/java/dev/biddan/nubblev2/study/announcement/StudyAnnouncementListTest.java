@@ -20,6 +20,7 @@ import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -340,6 +341,60 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 .body("announcements", hasSize(1))
                 .body("announcements[0].id", equalTo(announcement1Id.intValue()))
                 .body("announcements[0].meta.approvedCount", equalTo(1));
+    }
+
+    @Test
+    @DisplayName("공고 목록에 스터디 그룹 정보가 포함되어 조회된다")
+    void announcement_list_includes_study_group_information() {
+        // given: 특정 스터디 그룹 정보로 공고 생성
+        LocalDateTime baseTime = LocalDateTime.of(2024, 6, 1, 10, 0);
+        systemClock.setFixedTime(baseTime);
+
+        // given: 특정 스터디 그룹 생성
+        StudyGroupApiRequest.Create studyGroupRequest = StudyGroupApiRequest.Create.builder()
+                .name("백엔드 마스터 스터디")
+                .description("Spring Boot와 JPA를 깊이 있게 다루는 스터디입니다.")
+                .capacity(8)
+                .languages(List.of("JAVA", "KOTLIN"))
+                .mainLanguage("JAVA")
+                .difficultyLevels(List.of("LV3", "LV4"))
+                .problemPlatforms(List.of("PROGRAMMERS", "BAEKJOON"))
+                .meetingType("HYBRID")
+                .meetingRegion("서울시 강남구")
+                .mainMeetingDays(List.of("WED", "SAT"))
+                .build();
+
+        Response studyGroupResponse = StudyGroupApiTestClient.create(studyGroupRequest, ownerAuthSessionId);
+        Long studyGroupId = studyGroupResponse.jsonPath().getLong("studyGroup.id");
+
+        // given: 해당 스터디 그룹으로 공고 생성
+        StudyAnnouncementApiRequest.Create announcementRequest = StudyAnnouncementApiRequest.Create.builder()
+                .studyGroupId(studyGroupId)
+                .title("백엔드 개발자 모집")
+                .description("실무 경험을 쌓고 싶은 백엔드 개발자를 모집합니다.")
+                .recruitCapacity(3)
+                .endDate(LocalDate.now().plusDays(7))
+                .applicationFormContent("자기소개와 개발 경험을 적어주세요.")
+                .build();
+
+        StudyAnnouncementApiTestClient.create(announcementRequest, ownerAuthSessionId);
+
+        // when: 공고 목록 조회
+        Response response = StudyAnnouncementApiTestClient.findList(null, null, null);
+
+        // then: 스터디 그룹 정보가 포함되어 조회됨
+        response.then()
+                .statusCode(200)
+                .body("announcements", hasSize(1))
+                .body("announcements[0].title", equalTo("백엔드 개발자 모집"))
+                .body("announcements[0].studyGroup.id", equalTo(studyGroupId.intValue()))
+                .body("announcements[0].studyGroup.name", equalTo("백엔드 마스터 스터디"))
+                .body("announcements[0].studyGroup.mainLanguage", equalTo("JAVA"))
+                .body("announcements[0].studyGroup.capacity", equalTo(8))
+                .body("announcements[0].studyGroup.meetingType", equalTo("HYBRID"))
+                .body("announcements[0].studyGroup.meetingRegion", equalTo("서울시 강남구"))
+                .body("announcements[0].studyGroup.languages", equalTo(studyGroupRequest.languages()))
+                .body("announcements[0].studyGroup.difficultyLevels", equalTo(studyGroupRequest.difficultyLevels()));
     }
 
     private Long createStudyGroup() {

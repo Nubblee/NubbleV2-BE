@@ -6,6 +6,7 @@ import com.blazebit.persistence.view.Mapping;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement.AnnouncementStatus;
 import dev.biddan.nubblev2.study.announcement.domain.StudyAnnouncement.ClosedReason;
+import dev.biddan.nubblev2.study.group.repository.StudyGroupView;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -14,14 +15,8 @@ public record StudyAnnouncementView(
         @IdMapping
         Long id,
 
-        @Mapping("studyGroup.id")
-        Long studyGroupId,
-
         @Mapping("title.value")
         String title,
-
-        @Mapping("description.value")
-        String description,
 
         @Mapping("recruitCapacity.value")
         Integer recruitCapacity,
@@ -37,8 +32,7 @@ public record StudyAnnouncementView(
 
         LocalDateTime closedAt,
 
-        @Mapping("studyGroup.name.value")
-        String studyGroupName
+        StudyGroupView studyGroup
 ) {
 
 }
