@@ -12,3 +12,6 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+
+springdoc:
+  use-fqn: true
