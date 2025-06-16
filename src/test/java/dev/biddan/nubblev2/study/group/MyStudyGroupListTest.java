@@ -53,10 +53,8 @@ class MyStudyGroupListTest extends AbstractIntegrationTest {
         response.then()
                 .statusCode(200)
                 .body("studyGroups", hasSize(2))
-                .body("studyGroups[0].role", equalTo("LEADER"))
-                .body("studyGroups[0].studyGroup.name", equalTo("백엔드 개발 스터디"))
-                .body("studyGroups[1].role", equalTo("LEADER"))
-                .body("studyGroups[1].studyGroup.name", equalTo("알고리즘 마스터 스터디"));
+                .body("studyGroups[0].name", equalTo("백엔드 개발 스터디"))
+                .body("studyGroups[1].name", equalTo("알고리즘 마스터 스터디"));
     }
 
     @Test
