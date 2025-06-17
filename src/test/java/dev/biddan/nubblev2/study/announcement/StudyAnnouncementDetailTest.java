@@ -27,7 +27,8 @@ class StudyAnnouncementDetailTest extends AbstractIntegrationTest {
 
     private Long studyGroupId;
     private Long announcementId;
-    private StudyAnnouncementApiRequest.Create originalRequest;
+    private StudyAnnouncementApiRequest.Create announcementRequest;
+    private StudyGroupApiRequest.Create groupRequest;
 
     @BeforeEach
     void setUp() {
@@ -45,14 +46,14 @@ class StudyAnnouncementDetailTest extends AbstractIntegrationTest {
         String ownerAuthSessionId = ownerSessionCookie.getValue();
 
         // given: 스터디 그룹 생성
-        StudyGroupApiRequest.Create createRequest = StudyGroupRequestFixture.generateValidCreateRequest();
-        Response createResponse = StudyGroupApiTestClient.create(createRequest, ownerAuthSessionId);
+        groupRequest = StudyGroupRequestFixture.generateValidCreateRequest();
+        Response createResponse = StudyGroupApiTestClient.create(groupRequest, ownerAuthSessionId);
         studyGroupId = createResponse.jsonPath().getLong("studyGroup.id");
 
         // given: 스터디 공고 생성
-        originalRequest = StudyAnnouncementRequestFixture
+        announcementRequest = StudyAnnouncementRequestFixture
                 .generateValidCreateRequest(studyGroupId);
-        Response announcementResponse = StudyAnnouncementApiTestClient.create(originalRequest, ownerAuthSessionId);
+        Response announcementResponse = StudyAnnouncementApiTestClient.create(announcementRequest, ownerAuthSessionId);
         announcementId = announcementResponse.jsonPath().getLong("studyAnnouncement.id");
     }
 
@@ -65,18 +66,31 @@ class StudyAnnouncementDetailTest extends AbstractIntegrationTest {
         // then: 200 OK와 공고 상세 정보 반환
         response.then()
                 .statusCode(200)
+                // 공고 기본 정보 검증
                 .body("studyAnnouncement.announcement.id", equalTo(announcementId.intValue()))
                 .body("studyAnnouncement.announcement.studyGroupId", equalTo(studyGroupId.intValue()))
-                .body("studyAnnouncement.announcement.title", equalTo(originalRequest.title()))
-                .body("studyAnnouncement.announcement.description", equalTo(originalRequest.description()))
-                .body("studyAnnouncement.announcement.recruitCapacity", equalTo(originalRequest.recruitCapacity()))
-                .body("studyAnnouncement.meta.approvedCount", equalTo(0))
-                .body("studyAnnouncement.announcement.endDate", equalTo(originalRequest.endDate().toString()))
+                .body("studyAnnouncement.announcement.title", equalTo(announcementRequest.title()))
+                .body("studyAnnouncement.announcement.description", equalTo(announcementRequest.description()))
+                .body("studyAnnouncement.announcement.recruitCapacity", equalTo(announcementRequest.recruitCapacity()))
+                .body("studyAnnouncement.announcement.endDate", equalTo(announcementRequest.endDate().toString()))
                 .body("studyAnnouncement.announcement.status", equalTo("RECRUITING"))
                 .body("studyAnnouncement.announcement.closedReason", nullValue())
                 .body("studyAnnouncement.announcement.createdAt", notNullValue())
                 .body("studyAnnouncement.announcement.closedAt", nullValue())
-                .body("studyAnnouncement.announcement.applicationForm", equalTo(originalRequest.applicationFormContent()));
+                .body("studyAnnouncement.announcement.applicationForm", equalTo(announcementRequest.applicationFormContent()))
+
+                // 스터디 그룹 상세 정보 검증
+                .body("studyAnnouncement.studyGroup.id", equalTo(studyGroupId.intValue()))
+                .body("studyAnnouncement.studyGroup.name", equalTo(groupRequest.name()))
+                .body("studyAnnouncement.studyGroup.description", equalTo(groupRequest.description()))
+                .body("studyAnnouncement.studyGroup.capacity", equalTo(groupRequest.capacity()))
+                .body("studyAnnouncement.studyGroup.mainLanguage", equalTo(groupRequest.mainLanguage()))
+                .body("studyAnnouncement.studyGroup.meetingType", equalTo(groupRequest.meetingType()))
+                .body("studyAnnouncement.studyGroup.meetingRegion", equalTo(groupRequest.meetingRegion()))
+
+                // 메타 정보 검증
+                .body("studyAnnouncement.meta.approvedCount", equalTo(0));
+
     }
 
     @Test

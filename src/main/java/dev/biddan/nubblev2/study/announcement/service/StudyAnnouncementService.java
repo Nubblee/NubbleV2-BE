@@ -60,8 +60,9 @@ public class StudyAnnouncementService {
         return StudyAnnouncementInfo.Basic.from(announcement);
     }
 
+    @Transactional(readOnly = true)
     public StudyAnnouncementInfo.WithMeta findById(Long announcementId) {
-        StudyAnnouncement announcement = studyAnnouncementRepository.findById(announcementId)
+        StudyAnnouncement announcement = studyAnnouncementRepository.findByIdWithStudyGroup(announcementId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 모집 공고입니다"));
 
         int approvedCount = studyApplicationFormRepository.countApprovedApplicationsByAnnouncementId(announcementId)
