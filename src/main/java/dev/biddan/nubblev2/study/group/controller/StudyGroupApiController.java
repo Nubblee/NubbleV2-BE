@@ -5,6 +5,7 @@ import dev.biddan.nubblev2.interceptor.auth.AuthRequired;
 import dev.biddan.nubblev2.study.group.controller.StudyGroupApiResponse.Detail;
 import dev.biddan.nubblev2.study.group.service.StudyGroupService;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo;
+import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo.PageList;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -60,5 +62,18 @@ public class StudyGroupApiController {
         StudyGroupApiResponse.Detail response = new StudyGroupApiResponse.Detail(info);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StudyGroupInfo.PageList> findList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        page = page < 1 ? 1 : page;
+        size = Math.min(Math.max(size, 1), 50);
+
+        PageList pageList = studyGroupService.findList(page, size);
+
+        return ResponseEntity.ok(pageList);
     }
 }

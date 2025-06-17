@@ -127,7 +127,7 @@ class StudyGroupListTest extends AbstractIntegrationTest {
                 .body("studyGroups[0].meetingRegion", equalTo("서울시 강남구"))
                 .body("studyGroups[0].difficultyLevels", hasSize(2))
                 .body("studyGroups[0].mainMeetingDays", hasSize(2))
-                .body("studyGroups[0].currentMemberCount", equalTo(1));
+                .body("studyGroups[0].meta.currentMemberCount", equalTo(1));
     }
 
     @Test
