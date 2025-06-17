@@ -11,9 +11,9 @@ import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization;
 import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization.StudyGroupPermission;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +44,14 @@ public class StudyGroupService {
         }
 
         studyGroupUpdater.update(studyGroup, updateCommand);
+
+        return StudyGroupInfo.Detail.from(studyGroup);
+    }
+
+    @Transactional(readOnly = true)
+    public StudyGroupInfo.Detail getById(Long studyGroupId) {
+        StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 스터디 그룹입니다"));
 
         return StudyGroupInfo.Detail.from(studyGroup);
     }
