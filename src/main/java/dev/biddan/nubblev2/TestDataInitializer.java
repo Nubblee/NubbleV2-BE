@@ -134,7 +134,7 @@ public class TestDataInitializer implements ApplicationRunner {
 
         for (int i = 0; i < studyGroupCommands.size(); i++) {
             Long creatorId = leaderIds.get(i);
-            StudyGroupInfo.Private info = studyGroupService.create(creatorId, studyGroupCommands.get(i));
+            StudyGroupInfo.Detail info = studyGroupService.create(creatorId, studyGroupCommands.get(i));
             studyGroups.add(new TestStudyGroup(info, creatorId));
         }
 
@@ -223,7 +223,7 @@ public class TestDataInitializer implements ApplicationRunner {
     }
 
     public record TestStudyGroup(
-            StudyGroupInfo.Private studyGroup,
+            StudyGroupInfo.Detail studyGroup,
             Long leaderId
     ) {
 

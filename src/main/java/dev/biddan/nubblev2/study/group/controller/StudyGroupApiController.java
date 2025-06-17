@@ -2,9 +2,9 @@ package dev.biddan.nubblev2.study.group.controller;
 
 import dev.biddan.nubblev2.argument.userid.CurrentUserId;
 import dev.biddan.nubblev2.interceptor.auth.AuthRequired;
+import dev.biddan.nubblev2.study.group.controller.StudyGroupApiResponse.Detail;
 import dev.biddan.nubblev2.study.group.service.StudyGroupService;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo;
-import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo.Private;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,13 +26,13 @@ public class StudyGroupApiController {
 
     @AuthRequired
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StudyGroupApiResponse.Private> create(
+    public ResponseEntity<Detail> create(
             @RequestBody @Valid StudyGroupApiRequest.Create request,
             @CurrentUserId Long currentId
     ) {
-        StudyGroupInfo.Private info = studyGroupService.create(currentId, request.toCreateCommand());
+        StudyGroupInfo.Detail info = studyGroupService.create(currentId, request.toCreateCommand());
 
-        StudyGroupApiResponse.Private response = new StudyGroupApiResponse.Private(info);
+        Detail response = new Detail(info);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
@@ -40,14 +40,14 @@ public class StudyGroupApiController {
 
     @AuthRequired
     @PatchMapping(path = "/{studyGroupId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StudyGroupApiResponse.Private> update(
+    public ResponseEntity<Detail> update(
             @RequestBody @Valid StudyGroupApiRequest.Create request,
             @CurrentUserId Long currentId,
             @PathVariable Long studyGroupId
     ) {
-        StudyGroupInfo.Private info = studyGroupService.update(studyGroupId, currentId, request.toCreateCommand());
+        StudyGroupInfo.Detail info = studyGroupService.update(studyGroupId, currentId, request.toCreateCommand());
 
-        StudyGroupApiResponse.Private response = new StudyGroupApiResponse.Private(info);
+        Detail response = new Detail(info);
 
         return ResponseEntity.ok(response);
     }

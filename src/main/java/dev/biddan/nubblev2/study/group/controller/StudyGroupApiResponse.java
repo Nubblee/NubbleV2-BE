@@ -6,8 +6,8 @@ import java.util.List;
 
 public class StudyGroupApiResponse {
 
-    public record Private(
-            StudyGroupInfo.Private studyGroup
+    public record Detail(
+            StudyGroupInfo.Detail studyGroup
     ) {
 
     }
