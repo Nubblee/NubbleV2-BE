@@ -7,6 +7,7 @@ import dev.biddan.nubblev2.study.group.controller.StudyGroupApiRequest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.assertj.core.api.Java6BDDSoftAssertionsProvider;
 
 public class StudyGroupApiTestClient {
 
@@ -44,6 +45,15 @@ public class StudyGroupApiTestClient {
         return requestSpec
                 .when()
                 .get("/api/v1/user/study-groups")
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
+
+    public static Response getById(Long studyGroupId) {
+        return given()
+                .when()
+                .get("/api/v1/study-groups/{id}", studyGroupId)
                 .then()
                 .log().ifError()
                 .extract().response();
