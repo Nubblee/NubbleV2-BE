@@ -58,4 +58,23 @@ public class StudyGroupApiTestClient {
                 .log().ifError()
                 .extract().response();
     }
+
+    public static Response findList(Integer page, Integer size) {
+        RequestSpecification requestSpec = given();
+
+        if (page != null) {
+            requestSpec.queryParam("page", page);
+        }
+
+        if (size != null) {
+            requestSpec.queryParam("size", size);
+        }
+
+        return requestSpec
+                .when()
+                .get("/api/v1/study-groups")
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
 }
