@@ -394,7 +394,8 @@ class StudyAnnouncementListTest extends AbstractIntegrationTest {
                 .body("announcements[0].studyGroup.meetingType", equalTo("HYBRID"))
                 .body("announcements[0].studyGroup.meetingRegion", equalTo("서울시 강남구"))
                 .body("announcements[0].studyGroup.languages", equalTo(studyGroupRequest.languages()))
-                .body("announcements[0].studyGroup.difficultyLevels", equalTo(studyGroupRequest.difficultyLevels()));
+                .body("announcements[0].studyGroup.difficultyLevels", equalTo(studyGroupRequest.difficultyLevels()))
+                .body("announcements[0].studyGroup.meetingDays", equalTo(studyGroupRequest.mainMeetingDays()));
     }
 
     private Long createStudyGroup() {

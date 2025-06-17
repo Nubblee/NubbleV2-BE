@@ -4,10 +4,12 @@ import com.blazebit.persistence.PagedList;
 import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementView;
 import dev.biddan.nubblev2.study.announcement.service.dto.StudyAnnouncementInfo;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.DifficultyLevel;
+import dev.biddan.nubblev2.study.group.domain.StudyGroup.MeetingDay;
 import dev.biddan.nubblev2.study.group.domain.StudyGroup.ProgrammingLanguage;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupView;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;
@@ -35,6 +37,7 @@ public class StudyAnnouncementApiResponse {
                 PagedList<StudyAnnouncementView> pagedResult,
                 Map<Long, List<ProgrammingLanguage>> languagesMap,
                 Map<Long, List<DifficultyLevel>> difficultyLevelsMap,
+                Map<Long, List<MeetingDay>> meetingDaysMap,
                 Map<Long, Long> approvedCountsMap) {
 
             List<Preview> previews = pagedResult.stream()
@@ -43,8 +46,9 @@ public class StudyAnnouncementApiResponse {
 
                         return Preview.from(
                                 announcement,
-                                languagesMap.getOrDefault(studyGroupId, List.of()),
-                                difficultyLevelsMap.getOrDefault(studyGroupId, List.of()),
+                                languagesMap.getOrDefault(studyGroupId, Collections.emptyList()),
+                                difficultyLevelsMap.getOrDefault(studyGroupId, Collections.emptyList()),
+                                meetingDaysMap.getOrDefault(studyGroupId, Collections.emptyList()),
                                 approvedCountsMap.getOrDefault(announcement.id(), 0L).intValue()
                         );
                     })
@@ -80,6 +84,7 @@ public class StudyAnnouncementApiResponse {
                 StudyAnnouncementView view,
                 List<ProgrammingLanguage> languages,
                 List<DifficultyLevel> difficultyLevels,
+                List<MeetingDay> meetingDays,
                 int approvedCount) {
 
             return Preview.builder()
@@ -91,7 +96,7 @@ public class StudyAnnouncementApiResponse {
                     .closedReason(view.closedReason() != null ? view.closedReason().toString() : null)
                     .createdAt(view.createdAt())
                     .closedAt(view.closedAt())
-                    .studyGroup(StudyGroupPreview.of(view.studyGroup(), languages, difficultyLevels))
+                    .studyGroup(StudyGroupPreview.of(view.studyGroup(), languages, difficultyLevels, meetingDays))
                     .meta(new StudyAnnouncementInfo.Meta(approvedCount))
                     .build();
         }
@@ -106,13 +111,15 @@ public class StudyAnnouncementApiResponse {
             List<String> difficultyLevels,
             int capacity,
             String meetingType,
-            String meetingRegion
+            String meetingRegion,
+            List<String> meetingDays
     ) {
 
         public static  StudyGroupPreview of(
                 StudyGroupView view,
                 List<ProgrammingLanguage> languages,
-                List<DifficultyLevel> difficultyLevels) {
+                List<DifficultyLevel> difficultyLevels,
+                List<MeetingDay> meetingDays) {
 
             List<String> languageNames = languages.stream()
                     .map(ProgrammingLanguage::name)
@@ -120,6 +127,10 @@ public class StudyAnnouncementApiResponse {
 
             List<String> difficultyLevelNames = difficultyLevels.stream()
                     .map(DifficultyLevel::name)
+                    .toList();
+
+            List<String> meetingDayNames = meetingDays.stream()
+                    .map(MeetingDay::name)
                     .toList();
 
             return StudyGroupPreview.builder()
@@ -131,6 +142,7 @@ public class StudyAnnouncementApiResponse {
                     .capacity(view.capacity())
                     .meetingType(view.meetingType().name())
                     .meetingRegion(view.meetingRegion())
+                    .meetingDays(meetingDayNames)
                     .build();
         }
     }
