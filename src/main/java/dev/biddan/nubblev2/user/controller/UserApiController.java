@@ -7,11 +7,8 @@ import dev.biddan.nubblev2.exception.http.BadRequestException;
 import dev.biddan.nubblev2.http.AuthSessionCookieManager;
 import dev.biddan.nubblev2.http.HttpIpExtractor;
 import dev.biddan.nubblev2.interceptor.auth.AuthRequired;
-import dev.biddan.nubblev2.study.group.controller.StudyGroupApiResponse;
-import dev.biddan.nubblev2.study.group.controller.StudyGroupApiResponse.MyStudyGroups;
-import dev.biddan.nubblev2.study.group.domain.StudyGroup;
-import dev.biddan.nubblev2.study.member.domain.StudyGroupMember;
-import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
+import dev.biddan.nubblev2.study.group.service.StudyGroupService;
+import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo;
 import dev.biddan.nubblev2.user.controller.dto.AvailabilityApiResponse;
 import dev.biddan.nubblev2.user.controller.dto.UserApiRequest;
 import dev.biddan.nubblev2.user.controller.dto.UserApiResponse;
@@ -21,8 +18,6 @@ import dev.biddan.nubblev2.user.service.dto.UserInfo;
 import dev.biddan.nubblev2.user.service.dto.UserInfo.Private;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -44,7 +39,7 @@ public class UserApiController {
     private final HttpIpExtractor httpIpExtractor;
     private final AuthSessionCreator authSessionCreator;
     private final AuthSessionCookieManager authSessionCookieManager;
-    private final StudyGroupMemberRepository studyGroupMemberRepository;
+    private final StudyGroupService studyGroupService;
 
     @PostMapping(
             path = "/api/v1/users",
@@ -108,15 +103,8 @@ public class UserApiController {
 
     @AuthRequired
     @GetMapping("/api/v1/user/study-groups")
-    public ResponseEntity<StudyGroupApiResponse.MyStudyGroups> findMyStudyGroups(@CurrentUserId Long currentUserId) {
-        List<StudyGroupMember> studyGroupMembers = studyGroupMemberRepository.findByUserIdWithStudyGroupOrderByJoinedAtDesc(
-                currentUserId);
-
-        List<StudyGroup> studyGroups = studyGroupMembers.stream()
-                .map(StudyGroupMember::getStudyGroup)
-                .toList();
-
-        MyStudyGroups response = MyStudyGroups.of( studyGroups);
+    public ResponseEntity<StudyGroupInfo.PageList> findMyStudyGroups(@CurrentUserId Long currentUserId) {
+        StudyGroupInfo.PageList response = studyGroupService.findStudyGroupsByUserId(currentUserId);
 
         return ResponseEntity.ok(response);
     }

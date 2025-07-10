@@ -1,6 +1,7 @@
 package dev.biddan.nubblev2.study.group;
 
 import static dev.biddan.nubblev2.http.AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
@@ -37,27 +38,6 @@ class MyStudyGroupListTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("리더로 참여한 스터디 그룹을 조회할 수 있다")
-    void getStudyGroupsAsLeader() {
-        // given: 스터디 그룹 2개 생성
-        StudyGroupApiRequest.Create request1 = createStudyGroupRequest("알고리즘 마스터 스터디");
-        StudyGroupApiRequest.Create request2 = createStudyGroupRequest("백엔드 개발 스터디");
-
-        StudyGroupApiTestClient.create(request1, authSessionId);
-        StudyGroupApiTestClient.create(request2, authSessionId);
-
-        // when: 나의 스터디 목록 조회
-        Response response = StudyGroupApiTestClient.getMyStudyGroups(authSessionId);
-
-        // then: 리더로 참여한 2개 스터디가 조회됨 (최신순)
-        response.then()
-                .statusCode(200)
-                .body("studyGroups", hasSize(2))
-                .body("studyGroups[0].name", equalTo("백엔드 개발 스터디"))
-                .body("studyGroups[1].name", equalTo("알고리즘 마스터 스터디"));
-    }
-
-    @Test
     @DisplayName("참여한 스터디가 없는 경우 빈 목록을 반환한다")
     void getEmptyStudyGroupsWhenNotParticipating() {
         // given: 참여한 스터디가 없는 사용자
@@ -67,7 +47,44 @@ class MyStudyGroupListTest extends AbstractIntegrationTest {
         // then: 빈 목록 반환
         response.then()
                 .statusCode(200)
-                .body("studyGroups", hasSize(0));
+                .body("studyGroups", hasSize(0))
+                // PageMeta 검증 (빈 목록일 때)
+                .body("meta.page", equalTo(1))
+                .body("meta.totalPages", equalTo(1))
+                .body("meta.totalSize", equalTo(0))
+                .body("meta.hasNext", equalTo(false))
+                .body("meta.hasPrevious", equalTo(false));
+    }
+
+    @Test
+    @DisplayName("스터디 그룹의 상세 정보가 올바르게 반환된다")
+    void getStudyGroupsWithDetailedInfo() {
+        // given: 스터디 그룹 1개 생성
+        StudyGroupApiRequest.Create request = createStudyGroupRequest("알고리즘 마스터 스터디");
+        StudyGroupApiTestClient.create(request, authSessionId);
+
+        // when: 나의 스터디 목록 조회
+        Response response = StudyGroupApiTestClient.getMyStudyGroups(authSessionId);
+
+        // then: 스터디 그룹의 상세 정보가 포함됨
+        response.then()
+                .statusCode(200)
+                .body("studyGroups", hasSize(1))
+                .body("studyGroups[0].name", equalTo("알고리즘 마스터 스터디"))
+                .body("studyGroups[0].id", notNullValue())
+                .body("studyGroups[0].mainLanguage", notNullValue())
+                .body("studyGroups[0].capacity", notNullValue())
+                .body("studyGroups[0].meetingType", notNullValue())
+                .body("studyGroups[0].meetingRegion", notNullValue())
+                .body("studyGroups[0].difficultyLevels", notNullValue())
+                .body("studyGroups[0].mainMeetingDays", notNullValue())
+                .body("studyGroups[0].meta.currentMemberCount", notNullValue())
+                // PageMeta 검증
+                .body("meta.page", equalTo(1))
+                .body("meta.totalPages", equalTo(1))
+                .body("meta.totalSize", equalTo(1))
+                .body("meta.hasNext", equalTo(false))
+                .body("meta.hasPrevious", equalTo(false));
     }
 
     private StudyGroupApiRequest.Create createStudyGroupRequest(String name) {

@@ -12,6 +12,8 @@ import dev.biddan.nubblev2.study.group.service.dto.StudyGroupCommand.Create;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo.Detail;
 import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo.PageList;
+import dev.biddan.nubblev2.study.group.service.dto.StudyGroupInfo.PageMeta;
+import dev.biddan.nubblev2.study.member.domain.StudyGroupMember;
 import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
 import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization;
 import dev.biddan.nubblev2.study.member.service.StudyGroupAuthorization.StudyGroupPermission;
@@ -82,5 +84,66 @@ public class StudyGroupService {
                 studyGroupMemberRepository.countMembersByStudyGroupIds(studyGroupIds);
 
         return PageList.of(studyGroups, difficultyLevelsMap, meetingDaysMap, memberCountsMap);
+    }
+
+    @Transactional(readOnly = true)
+    public PageList findStudyGroupsByUserId(Long userId) {
+        List<StudyGroupMember> studyGroupMembers = studyGroupMemberRepository.findByUserIdWithStudyGroupOrderByJoinedAtDesc(userId);
+
+        List<StudyGroup> studyGroups = studyGroupMembers.stream()
+                .map(StudyGroupMember::getStudyGroup)
+                .toList();
+
+        if (studyGroups.isEmpty()) {
+            return new PageList(List.of(), PageMeta.builder()
+                    .page(1)
+                    .totalPages(1)
+                    .totalSize(0L)
+                    .hasNext(false)
+                    .hasPrevious(false)
+                    .build());
+        }
+
+        List<Long> studyGroupIds = studyGroups.stream()
+                .map(StudyGroup::getId)
+                .toList();
+
+        Map<Long, List<StudyGroup.DifficultyLevel>> difficultyLevelsMap =
+                studyGroupRepository.findDifficultyLevelsMapByStudyGroupIds(studyGroupIds);
+        Map<Long, List<StudyGroup.MeetingDay>> meetingDaysMap =
+                studyGroupRepository.findMeetingDaysMapByStudyGroupIds(studyGroupIds);
+        Map<Long, Long> memberCountsMap =
+                studyGroupMemberRepository.countMembersByStudyGroupIds(studyGroupIds);
+
+        List<StudyGroupInfo.Preview> previews = studyGroups.stream()
+                .map(studyGroup -> StudyGroupInfo.Preview.builder()
+                        .id(studyGroup.getId())
+                        .name(studyGroup.getName().getValue())
+                        .mainLanguage(studyGroup.getLanguages().getMainLanguage().name())
+                        .capacity(studyGroup.getCapacity().getValue())
+                        .meetingType(studyGroup.getMeeting().getMeetingType().name())
+                        .meetingRegion(studyGroup.getMeeting().getMeetingRegion())
+                        .difficultyLevels(difficultyLevelsMap.getOrDefault(studyGroup.getId(), List.of())
+                                .stream()
+                                .map(StudyGroup.DifficultyLevel::name)
+                                .toList())
+                        .mainMeetingDays(meetingDaysMap.getOrDefault(studyGroup.getId(), List.of())
+                                .stream()
+                                .map(StudyGroup.MeetingDay::name)
+                                .toList())
+                        .meta(new StudyGroupInfo.PreviewMeta(
+                                memberCountsMap.getOrDefault(studyGroup.getId(), 0L).intValue()))
+                        .build())
+                .toList();
+
+        StudyGroupInfo.PageMeta pageMeta = StudyGroupInfo.PageMeta.builder()
+                .page(1)
+                .totalPages(1)
+                .totalSize((long) studyGroups.size())
+                .hasNext(false)
+                .hasPrevious(false)
+                .build();
+
+        return new PageList(previews, pageMeta);
     }
 }
