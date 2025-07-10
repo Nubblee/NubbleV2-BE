@@ -9,6 +9,8 @@ import dev.biddan.nubblev2.study.announcement.repository.StudyAnnouncementReposi
 import dev.biddan.nubblev2.study.applicationform.repository.StudyApplicationFormRepository;
 import dev.biddan.nubblev2.study.group.repository.StudyGroupRepository;
 import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
+import dev.biddan.nubblev2.study.problem.repository.ProblemRepository;
+import dev.biddan.nubblev2.study.problem.service.ProblemService;
 import dev.biddan.nubblev2.user.repository.UserRepository;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
@@ -57,6 +59,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected StudyGroupMemberRepository studyGroupMemberRepository;
+
+    @Autowired
+    protected ProblemRepository problemRepository;
 
 
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");

@@ -1,9 +1,12 @@
 package dev.biddan.nubblev2.study.member.repository;
 
+import dev.biddan.nubblev2.study.group.domain.StudyGroup;
 import dev.biddan.nubblev2.study.member.domain.StudyGroupMember;
 import dev.biddan.nubblev2.study.member.domain.StudyGroupMember.MemberRole;
+import dev.biddan.nubblev2.user.domain.User;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -56,4 +59,6 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
                         row -> row[1]
                 ));
     }
+
+    Optional<StudyGroupMember> findByStudyGroupAndUser(StudyGroup studyGroup, User user);
 }
