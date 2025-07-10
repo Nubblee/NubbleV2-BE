@@ -21,6 +21,17 @@ public class ProblemApiTestClient {
                 .extract().response();
     }
 
+    public static Response getProblems(Long studyGroupId, int offset, int limit) {
+        return given()
+                .queryParam("offset", offset)
+                .queryParam("limit", limit)
+                .when()
+                .get("/api/v1/study-groups/{studyGroupId}/problems", studyGroupId)
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
+
     public static Response deleteProblem(Long studyGroupId, Long problemId, String authSessionId) {
         return given()
                 .cookie(AUTH_SESSION_COOKIE_NAME, authSessionId)

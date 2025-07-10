@@ -9,11 +9,13 @@ import dev.biddan.nubblev2.study.member.repository.StudyGroupMemberRepository;
 import dev.biddan.nubblev2.study.problem.controller.dto.ProblemApiRequest;
 import dev.biddan.nubblev2.study.problem.domain.Problem;
 import dev.biddan.nubblev2.study.problem.repository.ProblemRepository;
-import dev.biddan.nubblev2.study.problem.service.dto.ProblemCommand;
 import dev.biddan.nubblev2.study.problem.service.dto.ProblemInfo;
 import dev.biddan.nubblev2.user.domain.User;
 import dev.biddan.nubblev2.user.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +66,16 @@ public class ProblemService {
 
         problem.softDelete();
         problemRepository.save(problem);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProblemInfo> findProblemsWithOffset(Long studyGroupId, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        List<Problem> problems = problemRepository.findByStudyGroupIdOrderByCreatedAtDesc(studyGroupId, pageable);
+        
+        return problems.stream()
+                .map(ProblemInfo::from)
+                .toList();
     }
 
     private void validateStudyGroupLeader(User user, StudyGroup studyGroup) {
