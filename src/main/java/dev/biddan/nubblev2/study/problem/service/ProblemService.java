@@ -48,6 +48,24 @@ public class ProblemService {
         return ProblemInfo.from(savedProblem);
     }
 
+    @Transactional
+    public void deleteProblem(Long problemId, Long userId) {
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new NotFoundException("문제를 찾을 수 없습니다"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다"));
+
+        validateStudyGroupLeader(user, problem.getStudyGroup());
+
+        if (problem.isDeleted()) {
+            return;
+        }
+
+        problem.softDelete();
+        problemRepository.save(problem);
+    }
+
     private void validateStudyGroupLeader(User user, StudyGroup studyGroup) {
         StudyGroupMember member = studyGroupMemberRepository
                 .findByStudyGroupAndUser(studyGroup, user)

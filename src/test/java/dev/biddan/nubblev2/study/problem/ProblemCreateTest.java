@@ -147,4 +147,34 @@ class ProblemCreateTest extends AbstractIntegrationTest {
         response.then()
                 .statusCode(401);
     }
+
+    @Test
+    @DisplayName("스터디 그룹장이 문제를 성공적으로 삭제할 수 있다")
+    void deleteProblemAsLeader() {
+        // given: 문제 생성
+        ProblemApiRequest.Create createRequest = ProblemApiRequest.Create.builder()
+                .title("두 수의 합")
+                .url("https://programmers.co.kr/learn/courses/30/lessons/1")
+                .date(LocalDate.now())
+                .build();
+
+        Response createResponse = ProblemApiTestClient.createProblem(studyGroupId, createRequest, authSessionId);
+        Long problemId = createResponse.jsonPath().getLong("problem.id");
+
+        // when: 문제 삭제
+        Response deleteResponse = ProblemApiTestClient.deleteProblem(studyGroupId, problemId, authSessionId);
+
+        // then: 204 No Content 응답
+        deleteResponse.then()
+                .statusCode(204);
+
+        // then: 문제가 soft delete 되었는지 확인
+        assertThat(problemRepository.findById(problemId))
+                .isPresent()
+                .get()
+                .satisfies(problem -> {
+                    assertThat(problem.isDeleted()).isTrue();
+                    assertThat(problem.getDeletedAt()).isNotNull();
+                });
+    }
 }

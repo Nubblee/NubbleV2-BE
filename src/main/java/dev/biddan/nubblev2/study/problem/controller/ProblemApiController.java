@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,5 +34,17 @@ public class ProblemApiController {
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ProblemApiResponse.Create(problemService.createProblem(studyGroupId, request, userId)));
+    }
+
+    @DeleteMapping("/{studyGroupId}/problems/{problemId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @AuthRequired
+    public ResponseEntity<Void> deleteProblem(
+            @PathVariable Long studyGroupId,
+            @PathVariable Long problemId,
+            @CurrentUserId Long userId
+    ) {
+        problemService.deleteProblem(problemId, userId);
+        return ResponseEntity.noContent().build();
     }
 }

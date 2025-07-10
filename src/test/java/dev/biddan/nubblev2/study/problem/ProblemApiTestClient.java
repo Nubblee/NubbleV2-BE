@@ -20,4 +20,14 @@ public class ProblemApiTestClient {
                 .log().ifError()
                 .extract().response();
     }
+
+    public static Response deleteProblem(Long studyGroupId, Long problemId, String authSessionId) {
+        return given()
+                .cookie(AUTH_SESSION_COOKIE_NAME, authSessionId)
+                .when()
+                .delete("/api/v1/study-groups/{studyGroupId}/problems/{problemId}", studyGroupId, problemId)
+                .then()
+                .log().ifError()
+                .extract().response();
+    }
 }

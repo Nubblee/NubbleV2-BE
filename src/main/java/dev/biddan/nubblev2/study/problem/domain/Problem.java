@@ -52,9 +52,11 @@ public class Problem {
     @JoinColumn(name = "study_group_id", nullable = false, updatable = false)
     private StudyGroup studyGroup;
 
-    @ElementCollection
-    @Column(name = "tag")
-    private List<String> tags;
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -73,5 +75,14 @@ public class Problem {
         this.date = date;
         this.createdBy = createdBy;
         this.studyGroup = studyGroup;
+    }
+
+    public void softDelete() {
+        this.deleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public boolean isDeleted() {
+        return this.deleted;
     }
 }
