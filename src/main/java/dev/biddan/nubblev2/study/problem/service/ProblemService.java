@@ -69,13 +69,21 @@ public class ProblemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProblemInfo> findProblemsWithOffset(Long studyGroupId, int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset / limit, limit);
-        List<Problem> problems = problemRepository.findByStudyGroupIdOrderByCreatedAtDesc(studyGroupId, pageable);
+    public ProblemInfo.PageList findProblemsWithPage(Long studyGroupId, int page, int limit) {
+        StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(() -> new NotFoundException("스터디 그룹을 찾을 수 없습니다"));
         
-        return problems.stream()
+        int offset = (page - 1) * limit;
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        
+        List<Problem> problems = problemRepository.findByStudyGroupIdOrderByCreatedAtDesc(studyGroupId, pageable);
+        long totalCount = problemRepository.countByStudyGroupIdAndNotDeleted(studyGroupId);
+        
+        List<ProblemInfo> problemInfos = problems.stream()
                 .map(ProblemInfo::from)
                 .toList();
+        
+        return ProblemInfo.PageList.of(problemInfos, page, limit, totalCount);
     }
 
     private void validateStudyGroupLeader(User user, StudyGroup studyGroup) {

@@ -11,4 +11,7 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     
     @Query("SELECT p FROM Problem p WHERE p.studyGroup.id = :studyGroupId AND p.deleted = false ORDER BY p.createdAt DESC")
     List<Problem> findByStudyGroupIdOrderByCreatedAtDesc(@Param("studyGroupId") Long studyGroupId, Pageable pageable);
+    
+    @Query("SELECT COUNT(p) FROM Problem p WHERE p.studyGroup.id = :studyGroupId AND p.deleted = false")
+    long countByStudyGroupIdAndNotDeleted(@Param("studyGroupId") Long studyGroupId);
 }

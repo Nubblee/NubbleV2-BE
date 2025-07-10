@@ -41,14 +41,21 @@ public class ProblemApiController {
     }
 
     @GetMapping("/{studyGroupId}/problems")
-    public ResponseEntity<List<ProblemInfo>> getProblemsWithOffset(
+    public ResponseEntity<ProblemInfo.PageList> getProblemsWithPage(
             @PathVariable Long studyGroupId,
-            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        limit = Math.min(Math.max(limit, 1), 100);
-        List<ProblemInfo> problems = problemService.findProblemsWithOffset(studyGroupId, offset, limit);
-        return ResponseEntity.ok(problems);
+        if (page < 1) {
+            page = 1;
+        }
+        if (limit < 1) {
+            limit = 1;
+        }
+        limit = Math.min(limit, 100);
+        
+        ProblemInfo.PageList pageList = problemService.findProblemsWithPage(studyGroupId, page, limit);
+        return ResponseEntity.ok(pageList);
     }
 
     @DeleteMapping("/{studyGroupId}/problems/{problemId}")

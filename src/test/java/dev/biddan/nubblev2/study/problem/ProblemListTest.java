@@ -44,7 +44,6 @@ class ProblemListTest extends AbstractIntegrationTest {
         );
 
         Response loginResponse = AuthApiTestClient.login(loginRequest);
-        userId = loginResponse.jsonPath().getLong("user.id");
 
         Cookie sessionCookie = loginResponse.getDetailedCookie(AuthSessionCookieManager.AUTH_SESSION_COOKIE_NAME);
         authSessionId = sessionCookie.getValue();
@@ -64,12 +63,17 @@ class ProblemListTest extends AbstractIntegrationTest {
     @DisplayName("문제가 없는 스터디 그룹에서 빈 목록을 반환한다")
     void getProblemsWhenEmpty() {
         // when: 문제 목록 조회
-        Response response = ProblemApiTestClient.getProblems(studyGroupId, 0, 10);
+        Response response = ProblemApiTestClient.getProblems(studyGroupId, 1, 10);
 
         // then: 200 OK 응답과 빈 목록 반환
         response.then()
                 .statusCode(200)
-                .body("", hasSize(0));
+                .body("problems", hasSize(0))
+                .body("meta.page", equalTo(1))
+                .body("meta.totalPages", equalTo(0))
+                .body("meta.totalSize", equalTo(0))
+                .body("meta.hasNext", equalTo(false))
+                .body("meta.hasPrevious", equalTo(false));
     }
 
     @Test
@@ -97,13 +101,14 @@ class ProblemListTest extends AbstractIntegrationTest {
         ProblemApiTestClient.deleteProblem(studyGroupId, problemId2, authSessionId);
 
         // when: 문제 목록 조회
-        Response response = ProblemApiTestClient.getProblems(studyGroupId, 0, 10);
+        Response response = ProblemApiTestClient.getProblems(studyGroupId, 1, 10);
 
         // then: 활성 문제만 반환
         response.then()
                 .statusCode(200)
-                .body("", hasSize(1))
-                .body("[0].title", equalTo("활성 문제"));
+                .body("problems", hasSize(1))
+                .body("problems[0].title", equalTo("활성 문제"))
+                .body("meta.totalSize", equalTo(1));
     }
 
     @Test
@@ -144,15 +149,16 @@ class ProblemListTest extends AbstractIntegrationTest {
         ProblemApiTestClient.createProblem(studyGroupId, createRequest3, authSessionId);
 
         // when: 문제 목록 조회
-        Response response = ProblemApiTestClient.getProblems(studyGroupId, 0, 10);
+        Response response = ProblemApiTestClient.getProblems(studyGroupId, 1, 10);
 
         // then: 최신순으로 정렬된 문제 목록 반환
         response.then()
                 .statusCode(200)
-                .body("", hasSize(3))
-                .body("[0].title", equalTo("세 번째 문제"))  // 가장 최신
-                .body("[1].title", equalTo("두 번째 문제"))
-                .body("[2].title", equalTo("첫 번째 문제")); // 가장 오래된
+                .body("problems", hasSize(3))
+                .body("problems[0].title", equalTo("세 번째 문제"))  // 가장 최신
+                .body("problems[1].title", equalTo("두 번째 문제"))
+                .body("problems[2].title", equalTo("첫 번째 문제"))  // 가장 오래된
+                .body("meta.totalSize", equalTo(3));
     }
 
     @Test
@@ -175,27 +181,27 @@ class ProblemListTest extends AbstractIntegrationTest {
         ProblemApiTestClient.createProblem(anotherStudyGroupId, createRequest2, authSessionId);
 
         // when: 첫 번째 스터디 그룹의 문제 목록 조회
-        Response response1 = ProblemApiTestClient.getProblems(studyGroupId, 0, 10);
+        Response response1 = ProblemApiTestClient.getProblems(studyGroupId, 1, 10);
 
         // then: 첫 번째 그룹의 문제만 반환
         response1.then()
                 .statusCode(200)
-                .body("", hasSize(1))
-                .body("[0].title", equalTo("첫 번째 그룹 문제"));
+                .body("problems", hasSize(1))
+                .body("problems[0].title", equalTo("첫 번째 그룹 문제"));
 
         // when: 두 번째 스터디 그룹의 문제 목록 조회
-        Response response2 = ProblemApiTestClient.getProblems(anotherStudyGroupId, 0, 10);
+        Response response2 = ProblemApiTestClient.getProblems(anotherStudyGroupId, 1, 10);
 
         // then: 두 번째 그룹의 문제만 반환
         response2.then()
                 .statusCode(200)
-                .body("", hasSize(1))
-                .body("[0].title", equalTo("두 번째 그룹 문제"));
+                .body("problems", hasSize(1))
+                .body("problems[0].title", equalTo("두 번째 그룹 문제"));
     }
 
     @Test
-    @DisplayName("offset과 limit 파라미터가 정상적으로 동작한다")
-    void getProblemsWithOffsetAndLimit() {
+    @DisplayName("page와 limit 파라미터가 정상적으로 동작한다")
+    void getProblemsWithPageAndLimit() {
         // given: 5개의 문제 생성
         for (int i = 1; i <= 5; i++) {
             ProblemApiRequest.Create createRequest = ProblemApiRequest.Create.builder()
@@ -213,41 +219,45 @@ class ProblemListTest extends AbstractIntegrationTest {
             }
         }
 
-        // when: 첫 번째 페이지 조회 (offset=0, limit=2)
-        Response response1 = ProblemApiTestClient.getProblems(studyGroupId, 0, 2);
+        // when: 첫 번째 페이지 조회 (page=1, limit=2)
+        Response response1 = ProblemApiTestClient.getProblems(studyGroupId, 1, 2);
 
         // then: 최신 2개 문제 반환
         response1.then()
                 .statusCode(200)
-                .body("", hasSize(2))
-                .body("[0].title", equalTo("문제 5"))  // 가장 최신
-                .body("[1].title", equalTo("문제 4"));
+                .body("problems", hasSize(2))
+                .body("problems[0].title", equalTo("문제 5"))  // 가장 최신
+                .body("problems[1].title", equalTo("문제 4"))
+                .body("meta.page", equalTo(1))
+                .body("meta.totalSize", equalTo(5));
 
-        // when: 두 번째 페이지 조회 (offset=2, limit=2)
+        // when: 두 번째 페이지 조회 (page=2, limit=2)
         Response response2 = ProblemApiTestClient.getProblems(studyGroupId, 2, 2);
 
         // then: 다음 2개 문제 반환
         response2.then()
                 .statusCode(200)
-                .body("", hasSize(2))
-                .body("[0].title", equalTo("문제 3"))
-                .body("[1].title", equalTo("문제 2"));
+                .body("problems", hasSize(2))
+                .body("problems[0].title", equalTo("문제 3"))
+                .body("problems[1].title", equalTo("문제 2"))
+                .body("meta.page", equalTo(2));
 
-        // when: 세 번째 페이지 조회 (offset=4, limit=2)
-        Response response3 = ProblemApiTestClient.getProblems(studyGroupId, 4, 2);
+        // when: 세 번째 페이지 조회 (page=3, limit=2)
+        Response response3 = ProblemApiTestClient.getProblems(studyGroupId, 3, 2);
 
         // then: 마지막 1개 문제 반환
         response3.then()
                 .statusCode(200)
-                .body("", hasSize(1))
-                .body("[0].title", equalTo("문제 1"));  // 가장 오래된
+                .body("problems", hasSize(1))
+                .body("problems[0].title", equalTo("문제 1"))  // 가장 오래된
+                .body("meta.page", equalTo(3));
     }
 
     @Test
     @DisplayName("존재하지 않는 스터디 그룹 ID로 조회하면 404 응답을 받는다")
     void getProblemsWithNonExistentStudyGroup() {
         // when: 존재하지 않는 스터디 그룹의 문제 목록 조회
-        Response response = ProblemApiTestClient.getProblems(999L, 0, 10);
+        Response response = ProblemApiTestClient.getProblems(999L, 1, 10);
 
         // then: 404 Not Found 응답
         response.then()
@@ -266,11 +276,11 @@ class ProblemListTest extends AbstractIntegrationTest {
         ProblemApiTestClient.createProblem(studyGroupId, createRequest, authSessionId);
 
         // when: limit을 200으로 설정하여 조회
-        Response response = ProblemApiTestClient.getProblems(studyGroupId, 0, 200);
+        Response response = ProblemApiTestClient.getProblems(studyGroupId, 1, 200);
 
         // then: 정상적으로 응답 (내부적으로 100으로 제한됨)
         response.then()
                 .statusCode(200)
-                .body("", hasSize(1));
+                .body("problems", hasSize(1));
     }
 }
