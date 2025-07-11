@@ -18,7 +18,9 @@ public class ProblemApiRequest {
             
             @NotNull(message = "날짜는 필수입니다")
             @JsonFormat(pattern = "yyyy-MM-dd")
-            LocalDate date
+            LocalDate date,
+
+            String tag
     ) {
     }
 }

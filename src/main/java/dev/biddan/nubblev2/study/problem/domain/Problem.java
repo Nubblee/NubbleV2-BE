@@ -1,10 +1,8 @@
 package dev.biddan.nubblev2.study.problem.domain;
 
 import dev.biddan.nubblev2.study.group.domain.StudyGroup;
-import dev.biddan.nubblev2.study.member.domain.StudyGroupMember;
 import dev.biddan.nubblev2.user.domain.User;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +13,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,6 +41,9 @@ public class Problem {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @Column(name = "tag")
+    private String tag;
+
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false, updatable = false)
     private User createdBy;
@@ -63,7 +63,7 @@ public class Problem {
     private LocalDateTime createdAt;
 
     @Builder
-    public Problem(String title, String url, LocalDate date, User createdBy, StudyGroup studyGroup) {
+    public Problem(String title, String url, LocalDate date, String tag, User createdBy, StudyGroup studyGroup) {
         Assert.hasText(title, "제목은 필수입니다");
         Assert.hasText(url, "URL은 필수입니다");
         Assert.notNull(date, "날짜는 필수입니다");
@@ -73,6 +73,7 @@ public class Problem {
         this.title = title;
         this.url = url;
         this.date = date;
+        this.tag = tag;
         this.createdBy = createdBy;
         this.studyGroup = studyGroup;
     }

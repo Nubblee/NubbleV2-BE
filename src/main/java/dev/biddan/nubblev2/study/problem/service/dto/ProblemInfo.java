@@ -11,6 +11,7 @@ public record ProblemInfo(
         String title,
         String url,
         LocalDate date,
+        String tag,
         Long createdBy,
         Long studyGroupId,
         LocalDateTime createdAt
@@ -22,6 +23,7 @@ public record ProblemInfo(
                 problem.getTitle(),
                 problem.getUrl(),
                 problem.getDate(),
+                problem.getTag(),
                 problem.getCreatedBy().getId(),
                 problem.getStudyGroup().getId(),
                 problem.getCreatedAt()

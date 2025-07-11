@@ -42,6 +42,7 @@ public class ProblemService {
                 .title(request.title())
                 .url(request.url())
                 .date(request.date())
+                .tag(request.tag())
                 .createdBy(user)
                 .studyGroup(studyGroup)
                 .build();
